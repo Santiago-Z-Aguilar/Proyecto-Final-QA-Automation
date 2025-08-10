@@ -3,7 +3,7 @@
 import logging
 import time
 from utils.api_helpers import api_request, RETRIES, DELAY
-from utils.settings import USERS
+from utils.settings import USERS, AUTH_SIGN_UP
 
 logger = logging.getLogger("qa_tests")
 
@@ -23,6 +23,12 @@ def get_user_by_email(email, auth_headers, retries=RETRIES, delay=DELAY):
             logger.error(f"/users returned unexpected status: {resp.status_code}")
             break
     return None
+
+# def create_user_signup(email, auth_headers, retries=RETRIES, delay=DELAY):
+#     r = api_request("post", AUTH_SIGN_UP)
+
+
+
 
 def delete_user_by_email(email, auth_headers, retries=RETRIES, delay=DELAY):
     user = get_user_by_email(email, auth_headers, retries, delay)
