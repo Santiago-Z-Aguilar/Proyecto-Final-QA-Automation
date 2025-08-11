@@ -121,3 +121,10 @@ full_names_to_test = [
 ]
 
 
+# role_passenger = "passenger"
+# role_admin = "admin"
+#
+# roles_to_test = [
+#     {"role": role_passenger, "expected_status": 201},
+#     {"role": role_admin, "expected_status": 201}
+# ]
