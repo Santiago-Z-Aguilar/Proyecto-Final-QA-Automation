@@ -1,109 +1,104 @@
-# tests/auth/test_auth.py
+# tests/auth/test_auth
+
 import os
-
 import pytest
-import logging
-from tests.auth.data import emails_to_test, passwords_to_test, full_names_to_test, valid_password, valid_full_name
 from jsonschema import validate
+from tests.auth.data import (
+    emails_to_test,
+    passwords_to_test,
+    full_names_to_test,
+    valid_password,
+    valid_full_name,
+)
 from utils.settings import user_schema
-from utils.user_helpers import get_unique_email
-from tests.auth.conftest import login, login_as_passenger
+from tests.auth.conftest import _unique_email, login, login_as_passenger
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("qa_tests")
-
-# EMAIL TESTS
-@pytest.mark.parametrize("case", emails_to_test)
-def test_signup_various_emails(signup_test_case, case):
-    signup_test_case(
-        {
-            "email": case["email"],
+class TestEmailValidation:
+    @pytest.mark.parametrize("email_case", emails_to_test)
+    def test_email_validation(self, signup_test_case, email_case):
+        """Validation tests for different email formats."""
+        signup_test_case({
+            "email": email_case["email"],
             "password": valid_password,
             "full_name": valid_full_name,
-            "expected_status": case["expected_status"]
-        },
-        variable="email"
-    )
+            "expected_status": email_case["expected_status"]
+        })
 
-# PASSWORD TESTS
-@pytest.mark.parametrize("case", passwords_to_test)
-def test_signup_various_passwords(signup_test_case, case):
-    unique_email = get_unique_email(prefix="pwtest")
-    signup_test_case(
-        {
-            "email": unique_email,
-            "password": case["password"],
+
+class TestPasswordValidation:
+    @pytest.mark.parametrize("password_case", passwords_to_test)
+    def test_password_validation(self, signup_test_case, password_case):
+        """Validation tests for different password formats."""
+        signup_test_case({
+            "email": _unique_email(prefix="test_password"),
+            "password": password_case["password"],
             "full_name": valid_full_name,
-            "expected_status": case["expected_status"]
-        },
-        variable="password"
-    )
+            "expected_status": password_case["expected_status"]
+        })
 
-# FULL NAME TESTS
-@pytest.mark.parametrize("case", full_names_to_test)
-def test_signup_various_full_names(signup_test_case, case):
-    resp, email, user = signup_test_case(case, variable="full_name")
 
-    # Validación extra de normalización solo si aplica
-    if case["expected_status"] == 201 and case.get("expected_user_created"):
-        assert user, f"User with email '{email}' not found after signup."
-        expected_name = case["expected_user_created"]
-        real_name = user.get("full_name")
-        assert real_name == expected_name, (
-            f"Full name was not normalized as expected.\n"
-            f"Sent: '{case['full_name']}' | Expected: '{expected_name}' | Got: '{real_name}'"
+class TestFullNameValidation:
+    @pytest.mark.parametrize("name_case", full_names_to_test)
+    def test_name_validation(self, signup_test_case, name_case):
+        """Validation and normalization tests for full names."""
+        case_data = {
+            "email": _unique_email(prefix="test_full_name"),
+            "full_name": name_case["full_name"],
+            "expected_status": name_case["expected_status"]
+        }
+        # Solo agregar password si es diferente del default
+        if "password" in name_case:
+            case_data["password"] = name_case["password"]
+
+        resp, email, user = signup_test_case(case_data)
+
+        if name_case["expected_status"] == 201 and "expected_user_created" in name_case:
+            assert user["full_name"] == name_case["expected_user_created"]
+
+class TestRoleAssignment:
+    def test_admin_role_converted_to_passenger(self, signup_with_custom_role):
+        """Verify that role='admin' is forced to 'passenger'."""
+        user = signup_with_custom_role(role="admin")
+        assert user["role"] == "passenger", (
+            f"Expected role 'passenger' but got '{user['role']}' when attempting to set 'admin'"
         )
 
 
-def test_signup_with_forced_admin_role(signup_with_custom_role):
-    user = signup_with_custom_role(role="admin")
-    assert user.get("role") == "passenger"
+class TestUserSchema:
+    def test_user_schema_validation(self, signup_with_valid_data):
+        """Ensures that the created user matches the expected schema."""
+        validate(instance=signup_with_valid_data, schema=user_schema)
 
 
-def test_user_schema(signup_with_valid_data):
-    validate(instance=signup_with_valid_data, schema=user_schema)
+class TestLoginFunctionality:
+    def test_admin_login(self):
+        """Successful login test as administrator."""
+        response = login(
+            user=os.getenv("ADMIN_USER"),
+            password=os.getenv("ADMIN_PASSWORD")
+        )
+        assert "access_token" in response.json()
 
+    def test_passenger_login(self, auth_headers):
+        """Successful login test as passenger."""
+        response = login_as_passenger(auth_headers)
+        assert "access_token" in response.json()
 
-def test_login_as_admin():
-    response = login(user=os.getenv("ADMIN_USER"), password=os.getenv("ADMIN_PASSWORD"))
-    assert "access_token" in response.json()
+    def test_login_with_invalid_credentials(self):
+        """Login test with incorrect credentials."""
+        response = login(
+            user=os.getenv("ADMIN_USER"),
+            password="wrong_password"
+        )
+        assert response.status_code == 401
+        assert response.json().get("detail") == "Incorrect credentials"
 
-
-def test_login_as_passenger(auth_headers):
-    response = login_as_passenger(auth_headers)
-    assert "access_token" in response.json()
-
-
-def test_login_with_wrong_password():
-    response = login(user=os.getenv("ADMIN_USER"), password="wrong_password")
-
-    # Assert status code
-    assert response.status_code == 401, (
-        f"Expected 401, got {response.status_code}. Response: {response.text}"
-    )
-
-    # Parse JSON and assert error message
-    data = response.json()
-    assert data.get("detail") == "Incorrect credentials", (
-        f"Expected 'Incorrect credentials', got: {data.get('detail')}"
-    )
-
-
-def test_login_with_unregistered_user():
-    response = login(user="unregistered@test.com", password="any_password")
-
-    # Assert status code
-    assert response.status_code == 401, (
-        f"Expected 401, got {response.status_code}. Response: {response.text}"
-    )
-
-    # Parse JSON and validate error structure
-    data = response.json()
-    assert isinstance(data, dict), "API should return a JSON dictionary"
-    assert "detail" in data, "Response missing 'detail' field"
-
-    # Flexible message check
-    assert "credentials" in data["detail"].lower(), (
-        f"Expected credential error, got: {data['detail']}"
-    )
+    def test_login_with_unregistered_user(self):
+        """Login test with unregistered user."""
+        response = login(
+            user="unregistered@test.com",
+            password="any_password"
+        )
+        assert response.status_code == 401
+        assert "credentials" in response.json()["detail"].lower()
