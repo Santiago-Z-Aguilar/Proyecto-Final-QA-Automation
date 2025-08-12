@@ -94,6 +94,7 @@ raw_full_names = [
     {"full_name": "Test User", "expected_status": 201},
     {"full_name": "A", "expected_status": 201},
     {"full_name": "", "expected_status": 422},
+    {"full_name": "   ", "expected_status": 422},
     {"full_name": "José Pérez", "expected_status": 201},
     {"full_name": "O'Connor", "expected_status": 201},
     {"full_name": "Anna Maria", "expected_status": 201},
@@ -104,12 +105,11 @@ raw_full_names = [
     {"full_name": "@#$%^&*", "expected_status": 422},
     {"full_name": "李雷", "expected_status": 201},
     {"full_name": "José Hernández", "expected_status": 201},
-    {"full_name": " Anna", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": "Anna ", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": "Anna   Maria", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": "   ", "expected_status": 422, "test_case": "trimming"},
+    {"full_name": " Jhon", "expected_status": 201, "test_case": "trimming"},
+    {"full_name": "Lisa ", "expected_status": 201, "test_case": "trimming"},
+    {"full_name": "Anna   Laura", "expected_status": 201, "test_case": "trimming"},
     {"full_name": "   Anna   Maria   ", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": " Anna   ", "expected_status": 201, "test_case": "trimming"},
+    {"full_name": " Liz   ", "expected_status": 201, "test_case": "trimming"},
 ]
 
 full_names_to_test = [

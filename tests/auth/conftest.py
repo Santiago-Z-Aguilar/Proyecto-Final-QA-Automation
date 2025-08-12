@@ -1,9 +1,6 @@
-# tests/auth/conftest
-
 import logging
 from typing import Any, Dict, Optional, Tuple
 from uuid import uuid4
-
 import pytest
 
 from tests.auth.data import valid_password, valid_full_name
@@ -14,29 +11,27 @@ from utils.user_helpers import (
     delete_user_by_email,
     user_exist_skip,
     _create_user,
-    get_unique_email,
 )
 
-# Centralized logging configuration
+# ---------- Logging ----------
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("qa_tests")
 
 
-# ---------- Shared helpers ----------
+# ---------- Helpers ----------
+def _unique_email(prefix: str = "t") -> str:
+    """Genera un email único con UUID, seguro para ejecución en paralelo."""
+    return f"{prefix}_{uuid4().hex}@example.com"
+
 def _build_data(email: str, password: str, full_name: str, role: Optional[str] = None) -> Dict[str, Any]:
-    """Builds the request body for user creation."""
-    data: Dict[str, Any] = {
-        "email": email,
-        "password": password,
-        "full_name": full_name
-    }
+    """Construye el payload de creación de usuario."""
+    data = {"email": email, "password": password, "full_name": full_name}
     if role is not None:
         data["role"] = role
     return data
 
-
 def _assert_status(resp, expected_status: int, context: Dict[str, Any]) -> None:
-    """Ensures that the status code matches the expected one."""
+    """Valida que el status code sea el esperado."""
     assert resp is not None, "API response is None"
     assert resp.status_code == expected_status, (
         f"\n---\nTest failed for {context}\n"
@@ -44,91 +39,118 @@ def _assert_status(resp, expected_status: int, context: Dict[str, Any]) -> None:
         f"Response: {getattr(resp, 'text', '<no text>')}\n---"
     )
 
+def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, str, Optional[Dict[str, Any]]]:
+    """Lógica común para crear usuario y hacer cleanup híbrido."""
+    email = case.get("email", _unique_email(prefix=prefix))
+    password = case.get("password", valid_password)
+    full_name = case.get("full_name", valid_full_name)
+    expected_status = case["expected_status"]
 
-def _cleanup_if_created(email: str, auth_headers: Dict[str, str], resp) -> None:
-    """Deletes the user only if it was successfully created (201)."""
-    if resp and resp.status_code == 201:
+    # Solo verificar existencia previa si esperamos éxito
+    if expected_status == 201:
+        user_exist_skip(email, auth_headers)
+
+    data = _build_data(email, password, full_name)
+
+    resp = None
+    try:
+        resp = _create_user(data, auth_headers)
+        _assert_status(resp, expected_status, case)
+
+        # Obtener usuario solo si fue 201
+        user = get_user_by_email(email, auth_headers) if resp.status_code == 201 else None
+        return resp, email, user
+    finally:
+        # Cleanup híbrido:
+        # 1. Si API devolvió 201 → borrar
+        # 2. Si API devolvió otro código pero usuario existe → borrar igual
         try:
-            deleted = delete_user_by_email(email, auth_headers)
-            logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{email}' deleted")
+            existing_user = None
+            if resp and resp.status_code == 201:
+                existing_user = True
+            else:
+                # Buscar usuario solo si podría haberse creado
+                existing_user = get_user_by_email(email, auth_headers) is not None
+
+            if existing_user:
+                deleted = delete_user_by_email(email, auth_headers)
+                logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{email}' deleted")
         except Exception as e:
             logger.warning(f"Cleanup exception for '{email}': {e}")
 
 
-def _unique_email(prefix: str = "t") -> str:
-    """Generates a unique email."""
-    try:
-        return get_unique_email(prefix=prefix)
-    except Exception:
-        return f"{prefix}_{uuid4().hex}@example.com"
-
-
-# ---------- Fixtures ----------
+# ---------- Fixtures por campo ----------
 @pytest.fixture
-def signup_test_case(auth_headers):
-    """Fixture to execute signup test cases with automatic cleanup."""
+def signup_email_case(auth_headers):
+    """Fixture para probar validaciones de email."""
+    def _signup_email(case: Dict[str, Any]):
+        return _signup_case(case, auth_headers, prefix="emailtest")
+    return _signup_email
 
-    def _signup(case: Dict[str, Any]) -> Tuple[Any, str, Optional[Dict[str, Any]]]:
-        email = case.get("email", _unique_email())
-        password = case.get("password", valid_password)
-        full_name = case.get("full_name", valid_full_name)
-        expected_status = case["expected_status"]
+@pytest.fixture
+def signup_password_case(auth_headers):
+    """Fixture para probar validaciones de password."""
+    def _signup_password(case: Dict[str, Any]):
+        return _signup_case(case, auth_headers, prefix="pwtest")
+    return _signup_password
 
-        user_exist_skip(email, auth_headers)
-        data = _build_data(email, password, full_name)
-
-        resp = None
-        try:
-            resp = _create_user(data, auth_headers)
-            _assert_status(resp, expected_status, case)
-
-            user = get_user_by_email(email, auth_headers) if resp.status_code == 201 else None
-            return resp, email, user
-        finally:
-            _cleanup_if_created(email, auth_headers, resp)
-
-    return _signup
+@pytest.fixture
+def signup_full_name_case(auth_headers):
+    """Fixture para probar validaciones de full_name."""
+    def _signup_fullname(case: Dict[str, Any]):
+        return _signup_case(case, auth_headers, prefix="nametest")
+    return _signup_fullname
 
 
+# ---------- Otros fixtures ----------
 @pytest.fixture
 def signup_with_custom_role(auth_headers):
-    """Fixture to create users with custom roles (without validation)."""
+    """Fixture para crear usuarios con rol personalizado (sin validación)."""
     def _signup(role: str, prefix: str = "role_test"):
-        test_email = _unique_email(prefix=prefix)
+        test_email = _unique_email(prefix)
         data = _build_data(test_email, valid_password, valid_full_name, role=role)
 
         resp = None
         try:
             resp = _create_user(data, auth_headers)
-            _assert_status(resp, 201, {"attempted_role": role})  # Solo verifica que se creó
-            return get_user_by_email(test_email, auth_headers)  # Retorna el usuario SIN validar
+            _assert_status(resp, 201, {"attempted_role": role})
+            return get_user_by_email(test_email, auth_headers)
         finally:
-            _cleanup_if_created(test_email, auth_headers, resp)
+            try:
+                existing_user = get_user_by_email(test_email, auth_headers) is not None
+                if existing_user:
+                    deleted = delete_user_by_email(test_email, auth_headers)
+                    logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{test_email}' deleted")
+            except Exception as e:
+                logger.warning(f"Cleanup exception for '{test_email}': {e}")
     return _signup
-
 
 @pytest.fixture
 def signup_with_valid_data(auth_headers):
-    """Fixture to create a valid user with automatic cleanup."""
+    """Fixture para crear un usuario válido con cleanup automático."""
     unique_email = _unique_email(prefix="valid_user")
     data = _build_data(unique_email, valid_password, valid_full_name)
 
     user_exist_skip(unique_email, auth_headers)
     resp = None
-
     try:
         resp = _create_user(data, auth_headers)
         _assert_status(resp, 201, data)
-
         user = get_user_by_email(unique_email, auth_headers)
         yield user
     finally:
-        _cleanup_if_created(unique_email, auth_headers, resp)
+        try:
+            existing_user = get_user_by_email(unique_email, auth_headers) is not None
+            if existing_user:
+                deleted = delete_user_by_email(unique_email, auth_headers)
+                logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{unique_email}' deleted")
+        except Exception as e:
+            logger.warning(f"Cleanup exception for '{unique_email}': {e}")
 
 
 # ---------- Authentication helpers ----------
 def login(user: str, password: str):
-    """Performs login and returns the full response."""
+    """Realiza login y retorna la respuesta."""
     response = api_request("post", AUTH_LOGIN, data={"username": user, "password": password})
     if response is None:
         raise Exception("Login failed after retries")
@@ -136,9 +158,8 @@ def login(user: str, password: str):
         raise Exception(f"Unexpected status: {response.status_code}, Response: {response.text}")
     return response
 
-
 def login_as_passenger(auth_headers):
-    """Creates a passenger user and performs login."""
+    """Crea un pasajero y realiza login."""
     unique_email = _unique_email(prefix="passenger_test")
     data = _build_data(unique_email, valid_password, valid_full_name)
 
@@ -152,4 +173,10 @@ def login_as_passenger(auth_headers):
 
         return login(unique_email, valid_password)
     finally:
-        _cleanup_if_created(unique_email, auth_headers, resp)
+        try:
+            existing_user = get_user_by_email(unique_email, auth_headers) is not None
+            if existing_user:
+                deleted = delete_user_by_email(unique_email, auth_headers)
+                logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{unique_email}' deleted")
+        except Exception as e:
+            logger.warning(f"Cleanup exception for '{unique_email}': {e}")
