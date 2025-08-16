@@ -24,7 +24,7 @@ def _unique_email(prefix: str = "t") -> str:
     return f"{prefix}_{uuid4().hex}@example.com"
 
 def _build_data(email: str, password: str, full_name: str, role: Optional[str] = None) -> Dict[str, Any]:
-    """Construye el payload de creación de usuario."""
+    """Construye la data de creación de usuario."""
     data = {"email": email, "password": password, "full_name": full_name}
     if role is not None:
         data["role"] = role
