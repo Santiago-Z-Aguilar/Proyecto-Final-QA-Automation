@@ -3,7 +3,7 @@
 import os
 import pytest
 from jsonschema import validate
-from API.tests.auth.data import (
+from API.utils.data import (
     emails_to_test,
     passwords_to_test,
     full_names_to_test,

@@ -4,7 +4,7 @@ import logging
 from typing import Any, Dict, Optional, Tuple
 import pytest
 
-from API.tests.auth.data import valid_password, valid_full_name
+from API.utils.data import valid_password, valid_full_name
 from API.utils.api_helpers import api_request
 from API.utils.settings import AUTH_LOGIN
 from API.utils.user_helpers import (
