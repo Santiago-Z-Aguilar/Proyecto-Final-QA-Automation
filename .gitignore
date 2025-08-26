@@ -5,11 +5,6 @@ __pycache__/
 *.pyd
 *.pyc
 
-# Entornos virtuales
-venv/
-.env
-.env.*
-
 # Configuraciones de PyCharm
 .idea/
 *.iml
