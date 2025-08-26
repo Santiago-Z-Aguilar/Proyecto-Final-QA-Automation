@@ -39,7 +39,7 @@ def api_request(method, path, **kwargs):
             # Success case or non-retryable error
             if r.status_code not in RETRY_STATUS_CODES:
                 if failed_attempts > 0:
-                    logger.info(f"Request succeeded after {failed_attempts} retries")
+                    logger.info(f"api_request succeeded after {failed_attempts} retries")
                 return r
 
             # Only retry for status codes in RETRY_STATUS_CODES (500)

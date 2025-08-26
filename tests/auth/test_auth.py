@@ -57,7 +57,7 @@ class TestFullNameValidation:
 
 
 # ---------- Role assignment tests ----------
-def test_admin_role_converted_to_passenger(self, signup_with_custom_role):
+def test_admin_role_converted_to_passenger(signup_with_custom_role):
     user = signup_with_custom_role(role="admin")
     assert user["role"] == "passenger", (
         f"Expected role 'passenger' but got '{user['role']}' when attempting to set 'admin'"
@@ -65,7 +65,7 @@ def test_admin_role_converted_to_passenger(self, signup_with_custom_role):
 
 
 # ---------- Schema tests ----------
-def test_user_schema_validation(self, signup_with_valid_data):
+def test_user_schema_validation(signup_with_valid_data):
     validate(instance=signup_with_valid_data, schema=user_schema)
 
 

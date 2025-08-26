@@ -70,7 +70,7 @@ def normalize_name(name):
         return name
     return ' '.join(name.strip().split())
 
-valid_full_name = "Test User"
+valid_full_name = "Test Jasy"
 min_valid_full_name = "A"
 empty_full_name = ""
 name_with_accents = "José Pérez"
