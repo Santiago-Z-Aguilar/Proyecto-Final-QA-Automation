@@ -91,31 +91,33 @@ leading_and_trailing_spaces = "   Anna   Maria   "
 name_with_spaces_end = " Anna   "
 
 raw_full_names = [
-    {"full_name": "Test User", "expected_status": 201},
-    {"full_name": "A", "expected_status": 201},
-    {"full_name": "", "expected_status": 422},
-    {"full_name": "   ", "expected_status": 422},
-    {"full_name": "José Pérez", "expected_status": 201},
-    {"full_name": "O'Connor", "expected_status": 201},
-    {"full_name": "Anna Maria", "expected_status": 201},
-    {"full_name": "a" * 4095, "expected_status": 422},
-    {"full_name": "a" * 4096, "expected_status": 422},
-    {"full_name": "a" * 8192, "expected_status": 422},
-    {"full_name": "Anna123", "expected_status": 422},
-    {"full_name": "@#$%^&*", "expected_status": 422},
-    {"full_name": "李雷", "expected_status": 201},
-    {"full_name": "José Hernández", "expected_status": 201},
-    {"full_name": " Jhon", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": "Lisa ", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": "Anna   Laura", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": "   Anna   Maria   ", "expected_status": 201, "test_case": "trimming"},
-    {"full_name": " Liz   ", "expected_status": 201, "test_case": "trimming"},
+    {"full_name": valid_full_name, "expected_status": 201},
+    {"full_name": min_valid_full_name, "expected_status": 201},
+    {"full_name": empty_full_name, "expected_status": 422},
+    {"full_name": spaces_only_full_name, "expected_status": 422},
+    {"full_name": name_with_accents, "expected_status": 201},
+    {"full_name": name_with_apostrophe, "expected_status": 201},
+    {"full_name": name_with_space, "expected_status": 201},
+    {"full_name": below_max_full_name, "expected_status": 422},
+    {"full_name": max_full_name, "expected_status": 422},
+    {"full_name": above_max_full_name, "expected_status": 422},
+    {"full_name": alphanumeric_full_name, "expected_status": 422},
+    {"full_name": symbols_only_full_name, "expected_status": 422},
+    {"full_name": unicode_full_name, "expected_status": 201},
+    {"full_name": unicode_letters_with_spaces, "expected_status": 201},
+    {"full_name": leading_space_full_name, "expected_status": 201, "test_case": "trimming"},
+    {"full_name": trailing_space_full_name, "expected_status": 201, "test_case": "trimming"},
+    {"full_name": multiple_spaces_full_name, "expected_status": 201, "test_case": "trimming"},
+    {"full_name": leading_and_trailing_spaces, "expected_status": 201, "test_case": "trimming"},
+    {"full_name": name_with_spaces_end, "expected_status": 201, "test_case": "trimming"},
 ]
 
 full_names_to_test = [
     {
         **item,
-        "expected_user_created": normalize_name(item["full_name"]) if item["expected_status"] == 201 else None
+        "expected_user_created": normalize_name(item["full_name"])
+        if item["expected_status"] == 201
+        else None
     }
     for item in raw_full_names
 ]

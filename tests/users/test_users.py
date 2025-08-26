@@ -1,10 +1,10 @@
-from requests import RequestException
-from tests.users.conftest import user_fixture
-from utils.settings import user_schema, USERS
-import pytest
-from jsonschema import validate
-import time
-from tests.conftest import auth_headers, api_request, admin_token
+# from requests import RequestException
+# from tests.users.conftest import user_fixture
+# from utils.settings import user_schema, USERS
+# import pytest
+# from jsonschema import validate
+# import time
+# from tests.conftest import auth_headers, api_request, admin_token
 
 # @pytest.mark.parametrize('user_fixture', ['admin'], indirect=True)
 # def test_create_admin_user(auth_headers, user_fixture):

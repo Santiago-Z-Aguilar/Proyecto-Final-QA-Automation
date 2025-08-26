@@ -1,3 +1,5 @@
+# tests/auth/test_auth.py
+
 import os
 import pytest
 from jsonschema import validate
@@ -9,11 +11,7 @@ from tests.auth.data import (
     valid_full_name,
 )
 from utils.settings import user_schema
-from tests.auth.conftest import (
-    _unique_email,
-    login,
-    login_as_passenger
-)
+from tests.auth.conftest import login, login_as_passenger
 
 
 # ---------- Email tests ----------
@@ -53,22 +51,22 @@ class TestFullNameValidation:
         resp, email, user = signup_full_name_case(case_data)
 
         if name_case["expected_status"] == 201 and "expected_user_created" in name_case:
-            assert user["full_name"] == name_case["expected_user_created"]
+            assert user["full_name"] == name_case["expected_user_created"], (
+                f"Expected: {name_case['expected_user_created']} | Actual: {user['full_name']}\n"
+            )
 
 
 # ---------- Role assignment tests ----------
-class TestRoleAssignment:
-    def test_admin_role_converted_to_passenger(self, signup_with_custom_role):
-        user = signup_with_custom_role(role="admin")
-        assert user["role"] == "passenger", (
-            f"Expected role 'passenger' but got '{user['role']}' when attempting to set 'admin'"
-        )
+def test_admin_role_converted_to_passenger(self, signup_with_custom_role):
+    user = signup_with_custom_role(role="admin")
+    assert user["role"] == "passenger", (
+        f"Expected role 'passenger' but got '{user['role']}' when attempting to set 'admin'"
+    )
 
 
 # ---------- Schema tests ----------
-class TestUserSchema:
-    def test_user_schema_validation(self, signup_with_valid_data):
-        validate(instance=signup_with_valid_data, schema=user_schema)
+def test_user_schema_validation(self, signup_with_valid_data):
+    validate(instance=signup_with_valid_data, schema=user_schema)
 
 
 # ---------- Login tests ----------
@@ -98,4 +96,5 @@ class TestLoginFunctionality:
             password="any_password"
         )
         assert response.status_code == 401
-        assert "credentials" in response.json()["detail"].lower()
+        assert "password" not in response.json()["detail"].lower()
+        assert "email" not in response.json()["detail"].lower()
