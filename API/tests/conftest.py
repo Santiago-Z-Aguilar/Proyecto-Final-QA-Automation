@@ -1,5 +1,5 @@
 # tests/conftest.py
-
+from typing import Any, Dict, Optional
 from API.utils.settings import AUTH_LOGIN
 from dotenv import load_dotenv
 import os
@@ -16,6 +16,8 @@ import pytest
 
 logger = logging.getLogger("qa_tests")
 
+# ---------- Helpers ----------
+
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
     """
     Emit a clear error log whenever a test fails, with nodeid and a short traceback.
@@ -28,6 +30,17 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
         logger.error("TEST FAILED: %s\n%s", item.nodeid, short_tb)
     return report
 
+
+
+def _build_user_data(email: str, password: str, full_name: str, role: Optional[str] = None) -> Dict[str, Any]:
+    """Builds user creation payload."""
+    data = {"email": email, "password": password, "full_name": full_name}
+    if role is not None:
+        data["role"] = role
+    return data
+
+
+# ---------- Fixtures ----------
 
 @pytest.fixture(scope="session")
 def admin_token():
@@ -52,3 +65,5 @@ def auth_headers(admin_token):
 def test_auth_headers(admin_token):
     r = admin_token
     return r
+
+

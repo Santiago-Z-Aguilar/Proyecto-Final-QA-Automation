@@ -14,6 +14,7 @@ from API.utils.user_helpers import (
     user_exist_skip,
     _create_user,
 )
+from API.tests.conftest import _build_user_data
 
 # ---------- Logging ----------
 # NOTE: pytest already manages logging. Avoid basicConfig unless you need custom setup.
@@ -22,14 +23,6 @@ logger = logging.getLogger("qa_tests")
 
 
 # ---------- Helpers ----------
-
-def _build_data(email: str, password: str, full_name: str, role: Optional[str] = None) -> Dict[str, Any]:
-    """Builds user creation payload."""
-    data = {"email": email, "password": password, "full_name": full_name}
-    if role is not None:
-        data["role"] = role
-    return data
-
 
 def _assert_created_user_status(resp, expected_status: int, context: Dict[str, Any]) -> None:
     """
@@ -65,7 +58,7 @@ def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, 
     if expected_status == 201:
         user_exist_skip(email, auth_headers)
 
-    data = _build_data(email, password, full_name)
+    data = _build_user_data(email, password, full_name)
 
     resp = None
     user = None
@@ -129,7 +122,7 @@ def signup_with_custom_role(auth_headers):
     """Fixture to create users with custom role (always expects success)."""
     def _signup(role: str, prefix: str = "role_test_jasy"):
         test_email = get_unique_email(prefix)
-        data = _build_data(test_email, valid_password, valid_full_name, role=role)
+        data = _build_user_data(test_email, valid_password, valid_full_name, role=role)
 
         resp = None
         try:
@@ -150,7 +143,7 @@ def signup_with_custom_role(auth_headers):
 def signup_with_valid_data(auth_headers):
     """Fixture to create a valid user and yield its object, with auto cleanup."""
     unique_email = get_unique_email(prefix="valid_user_jasy")
-    data = _build_data(unique_email, valid_password, valid_full_name)
+    data = _build_user_data(unique_email, valid_password, valid_full_name)
 
     user_exist_skip(unique_email, auth_headers)
     resp = None
@@ -182,7 +175,7 @@ def login(user: str, password: str):
 def login_as_passenger(auth_headers):
     """Creates a passenger user and logs in. Ensures role is 'passenger'."""
     unique_email = get_unique_email(prefix="passenger_test_jasy")
-    data = _build_data(unique_email, valid_password, valid_full_name)
+    data = _build_user_data(unique_email, valid_password, valid_full_name)
 
     resp = None
     try:
