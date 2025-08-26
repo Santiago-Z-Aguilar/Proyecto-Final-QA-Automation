@@ -1,13 +1,11 @@
 # tests/conftest.py
 
-from utils.settings import BASE_URL, AUTH_LOGIN, USERS, AUTH_SIGN_UP
+from API.utils.settings import AUTH_LOGIN
 from dotenv import load_dotenv
 import os
-import pytest
 import faker
-import time
 
-from utils.api_helpers import api_request
+from API.utils.api_helpers import api_request
 
 load_dotenv()
 

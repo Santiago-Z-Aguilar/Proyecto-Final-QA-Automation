@@ -3,15 +3,15 @@
 import os
 import pytest
 from jsonschema import validate
-from tests.auth.data import (
+from API.tests.auth.data import (
     emails_to_test,
     passwords_to_test,
     full_names_to_test,
     valid_password,
     valid_full_name,
 )
-from utils.settings import user_schema
-from tests.auth.conftest import login, login_as_passenger
+from API.utils.settings import user_schema
+from API.tests.auth.conftest import login, login_as_passenger
 
 
 # ---------- Email tests ----------

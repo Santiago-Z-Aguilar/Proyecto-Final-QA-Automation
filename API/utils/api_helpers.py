@@ -3,7 +3,7 @@
 import requests
 import time
 import logging
-from utils.settings import BASE_URL
+from API.utils.settings import BASE_URL
 
 RETRIES = 15  # Max retry attempts
 DELAY = 1  # Delay between retries in seconds

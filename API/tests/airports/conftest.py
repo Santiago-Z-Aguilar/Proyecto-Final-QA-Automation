@@ -1,10 +1,8 @@
-from utils.settings import AIRPORT
-from tests.conftest import auth_headers, admin_token
-from utils.api_helpers import api_request
+from API.utils.settings import AIRPORT
+from API.tests.conftest import auth_headers
+from API.utils.api_helpers import api_request
 import faker
 import pytest
-import random
-import string
 import time
 
 fake = faker.Faker()

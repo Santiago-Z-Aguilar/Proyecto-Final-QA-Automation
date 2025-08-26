@@ -4,8 +4,8 @@ import logging
 from uuid import uuid4
 from typing import Dict, Optional
 from requests.models import Response
-from utils.api_helpers import api_request
-from utils.settings import USERS, AUTH_SIGN_UP
+from API.utils.api_helpers import api_request
+from API.utils.settings import USERS, AUTH_SIGN_UP
 import pytest
 from time import sleep
 
