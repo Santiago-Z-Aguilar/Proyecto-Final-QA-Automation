@@ -58,13 +58,13 @@ def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, 
     # if expected_status == 201:
     #     user_exist_skip(email, auth_headers)
 
-    data = _build_user_data(email, password, full_name)
+    payload = _build_user_data(email, password, full_name)
 
     resp = None
     user = None
     try:
         resp = _create_user(
-            data,
+            payload,
             auth_headers,
             path=AUTH_SIGN_UP,
             treat_duplicate_as_success=(expected_status == 201)

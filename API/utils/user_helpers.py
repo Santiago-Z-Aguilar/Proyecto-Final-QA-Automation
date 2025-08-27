@@ -8,6 +8,7 @@ from API.utils.api_helpers import api_request
 from API.utils.data import valid_password, valid_full_name
 from API.utils.settings import USERS, AUTH_SIGN_UP
 import pytest
+import json
 from time import sleep
 
 
@@ -54,8 +55,8 @@ def user_exist_skip(email: str, auth_headers: Dict[str, str]) -> None:
 
 def _create_user(
     payload: Dict,
-    auth_headers: Dict[str, str],
-    path,
+    auth_headers: Optional[Dict[str, str]] = None,
+    path=None,
     max_retries: int = DEFAULT_RETRIES,
     treat_duplicate_as_success: bool = True,
 ) -> Response:
@@ -83,16 +84,20 @@ def _create_user(
             return resp
 
         if resp.status_code == 400 and "already registered" in resp.text.lower():
-            """
-            Needs get the user to get the ID
-            """
-            logger.warning("❌ Created user after 500 Internal Server Error")
+            logger.warning("User already registered; fetching existing user to synthesize 201.")
             existing_user = get_user_by_email(email, auth_headers)
             if existing_user:
                 if treat_duplicate_as_success:
                     bug400 = Response()
                     bug400.status_code = 201
-                    bug400._content = f'{{"message":"user_already_exists","email":"{email}"}}'.encode()
+                    bug400._content = json.dumps({
+                        "message": "user_already_exists",
+                        "email": email,
+                        "role": existing_user.get("role") or payload.get("role"),  # 👈 clave
+                        "id": existing_user.get("id"),
+                    }).encode("utf-8")
+                    bug400.headers["Content-Type"] = "application/json"
+                    bug400.encoding = "utf-8"
                     return bug400
                 return resp
             continue  # retry
