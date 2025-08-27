@@ -17,24 +17,26 @@ from API.tests.auth.conftest import login, login_as_passenger
 
 # ---------- Email tests ----------
 class TestEmailValidation:
-    @pytest.mark.parametrize("email_case", emails_to_test)
-    def test_email_validation(self, signup_email_case, email_case):
+
+    @pytest.mark.parametrize("email, expected_status", emails_to_test.items())
+    def test_email_validation(self, signup_email_case, email, expected_status):
         signup_email_case({
-            "email": email_case["email"],
+            "email": email,
             "password": valid_password,
             "full_name": valid_full_name,
-            "expected_status": email_case["expected_status"]
+            "expected_status": expected_status,
         })
 
 
 # ---------- Password tests ----------
 class TestPasswordValidation:
-    @pytest.mark.parametrize("password_case", passwords_to_test)
-    def test_password_validation(self, signup_password_case, password_case):
+
+    @pytest.mark.parametrize("password, expected_status", passwords_to_test.items())
+    def test_password_validation(self, signup_password_case, password, expected_status):
         signup_password_case({
-            "password": password_case["password"],
+            "password": password,
             "full_name": valid_full_name,
-            "expected_status": password_case["expected_status"]
+            "expected_status": expected_status,
         })
 
 
