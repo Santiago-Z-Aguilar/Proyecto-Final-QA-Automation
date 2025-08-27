@@ -52,7 +52,6 @@ def passenger_token(admin_token):
 
     payload = _build_user_data(email, password, full_name)
 
-    # Header de admin para crear el usuario (si ya existe, lo tratamos como éxito)
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
     _create_user(
         payload=payload,
@@ -69,17 +68,15 @@ def passenger_token(admin_token):
         raise Exception("❌ Login failed after some retries")
 
     try:
-        return response.json()["access_token"]
+        token = response.json()["access_token"]
+        yield token  # Entrega el token para su uso
     except (KeyError, ValueError):
         raise Exception(f"❌ Login failed. Unexpected Response: {response.text}")
+    finally:
+        # Cleanup después de que todas las pruebas usen el token
+        delete_user_by_email(passenger_user_token_email, admin_headers)
 
 @pytest.fixture
 def passenger_headers(passenger_token):
     """Fixture de test que da headers, depende del session para cleanup."""
     return {"Authorization": f"Bearer {passenger_token}"}
-
-@pytest.fixture(scope="session")
-def passenger_session_delete(auth_headers):
-    """Fixture de sesión que limpia al final."""
-    yield  # no retorna nada, solo marca el punto donde pytest espera
-    delete_user_by_email(passenger_user_token_email, auth_headers)
