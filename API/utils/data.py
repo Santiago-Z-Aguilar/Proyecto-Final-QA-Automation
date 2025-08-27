@@ -1,12 +1,17 @@
 # tests/auth/data.py
 
 # ========== EMAILS ==========
-valid_domain = "@example.com"
-DEFAULT_EMAIL1 = f"test1{valid_domain}"
-DEFAULT_EMAIL2 = f"test2{valid_domain}"
+
 characters_63 = "a" * 63
 characters_64 = "a" * 64
 characters_65 = "a" * 65
+
+valid_domain = "@example.com"
+passenger_user_token_email = f"passenger_token_jasy{valid_domain}"
+DEFAULT_EMAIL1 = f"test1{valid_domain}"
+DEFAULT_EMAIL2 = f"test2{valid_domain}"
+
+
 valid_email = f"test{valid_domain}"
 empty_email = ""
 below_max_email = f"{characters_63}{valid_domain}"
@@ -17,19 +22,22 @@ email_with_missing_domain = "plainaddress"
 email_with_invalid_tld = "user@mail.c"
 unicode_characters_email = "用户@例子.公司"
 unicode_in_domain = "user@exámple.com"
+invalid_email = "not-an-email"
 
-emails_to_test = [
-    {"email": valid_email, "expected_status": 201},
-    {"email": empty_email, "expected_status": 422},
-    {"email": below_max_email, "expected_status": 201},
-    {"email": max_email, "expected_status": 201},
-    {"email": above_max_email, "expected_status": 422},
-    {"email": email_with_special_characters, "expected_status": 201},
-    {"email": email_with_missing_domain, "expected_status": 422},
-    {"email": email_with_invalid_tld, "expected_status": 422},
-    {"email": unicode_characters_email, "expected_status": 422},
-    {"email": unicode_in_domain, "expected_status": 422},
-]
+
+emails_to_test = {
+    valid_email: 201,
+    empty_email: 422,
+    below_max_email: 201,
+    max_email: 201,
+    above_max_email: 422,
+    email_with_special_characters: 201,
+    email_with_missing_domain: 422,
+    email_with_invalid_tld: 422,
+    unicode_characters_email: 422,
+    unicode_in_domain: 422,
+    invalid_email: 422,
+}
 
 # ========== PASSWORDS ==========
 valid_password = "P@ssw0rd"
@@ -45,20 +53,20 @@ special_characters_password = "!@#$%^&*()_+"
 unicode_characters_password = "áéíóúüñ¿¡"
 password_with_space = "abc 123"
 
-passwords_to_test = [
-    {"password": valid_password, "expected_status": 201},
-    {"password": min_valid_password, "expected_status": 201},
-    {"password": below_min_password, "expected_status": 422},
-    {"password": typical_password_1, "expected_status": 201},
-    {"password": typical_password_2, "expected_status": 201},
-    {"password": below_max_password, "expected_status": 422},
-    {"password": max_password, "expected_status": 422},
-    {"password": above_max_password, "expected_status": 422},
-    {"password": numbers_only_password, "expected_status": 201},
-    {"password": special_characters_password, "expected_status": 201},
-    {"password": unicode_characters_password, "expected_status": 201},
-    {"password": password_with_space, "expected_status": 201},
-]
+passwords_to_test = {
+    valid_password: 201,
+    min_valid_password: 201,
+    below_min_password: 422,
+    typical_password_1: 201,
+    typical_password_2: 201,
+    below_max_password: 422,
+    max_password: 422,
+    above_max_password: 422,
+    numbers_only_password: 201,
+    special_characters_password: 201,
+    unicode_characters_password: 201,
+    password_with_space: 201,
+}
 
 # ========== FULL NAMES ==========
 def normalize_name(name):
@@ -122,3 +130,8 @@ full_names_to_test = [
     for item in raw_full_names
 ]
 
+# ========== ROLES ==========
+
+passenger_role = "passenger"
+admin_role = "admin"
+invalid_role = "invalid_role"
