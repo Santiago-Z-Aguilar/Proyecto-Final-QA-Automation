@@ -13,7 +13,7 @@ logger = logging.getLogger("qa_tests")
 
 # Constants
 DEFAULT_RETRIES = 3
-CLEANUP_DELAY = 1  # Keep as-is, per your request.
+CLEANUP_DELAY = 1
 
 
 def get_unique_email(prefix: str = "test") -> str:
@@ -43,7 +43,7 @@ def user_exist_skip(email: str, auth_headers: Dict[str, str]) -> None:
         pytest.skip(f"User '{email}' already exists in database. Test skipped.")
 
 
-def _create_user(
+def _create_user_signup(
     payload: Dict,
     auth_headers: Dict[str, str],
     max_retries: int = DEFAULT_RETRIES,
@@ -76,6 +76,7 @@ def _create_user(
             """
             Needs get the user to get the ID
             """
+            logger.warning("❌ Created user after 500 Internal Server Error")
             existing_user = get_user_by_email(email, auth_headers)
             if existing_user:
                 if treat_duplicate_as_success:
@@ -89,6 +90,12 @@ def _create_user(
         return resp
 
     return last_resp
+
+def create_user_as_admin(auth_headers, payload):
+    resp = api_request("post", USERS, json=payload, headers=auth_headers)
+    return resp.json()
+
+
 
 
 def delete_user_by_email(email: str, auth_headers: Dict[str, str]) -> bool:

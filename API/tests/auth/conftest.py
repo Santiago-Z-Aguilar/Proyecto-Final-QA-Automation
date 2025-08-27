@@ -4,7 +4,7 @@ import logging
 from typing import Any, Dict, Optional, Tuple
 import pytest
 
-from API.utils.data import valid_password, valid_full_name
+from API.utils.data import valid_password, valid_full_name, valid_email
 from API.utils.api_helpers import api_request
 from API.utils.settings import AUTH_LOGIN
 from API.utils.user_helpers import (
@@ -12,7 +12,7 @@ from API.utils.user_helpers import (
     get_user_by_email,
     delete_user_by_email,
     user_exist_skip,
-    _create_user,
+    _create_user_signup
 )
 from API.tests.conftest import _build_user_data
 
@@ -55,15 +55,15 @@ def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, 
     full_name = case.get("full_name", valid_full_name)
     expected_status = case["expected_status"]
 
-    if expected_status == 201:
-        user_exist_skip(email, auth_headers)
+    # if expected_status == 201:
+    #     user_exist_skip(email, auth_headers)
 
     data = _build_user_data(email, password, full_name)
 
     resp = None
     user = None
     try:
-        resp = _create_user(
+        resp = _create_user_signup(
             data,
             auth_headers,
             treat_duplicate_as_success=(expected_status == 201)
@@ -91,6 +91,21 @@ def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, 
                 logger.info("Cleanup: %s User '%s' deleted", "✅" if deleted else "❌", email)
         except Exception as e:
             logger.warning("Cleanup exception for '%s': %s", email, e)
+
+
+def signup_with_existing_user(auth_headers):
+
+    payload = _build_user_data(valid_email, valid_password, valid_full_name)
+
+    try:
+        user = _create_user_signup(payload, auth_headers, treat_duplicate_as_success=True)
+        existing_user = _create_user_signup(payload, auth_headers, treat_duplicate_as_success=False)
+
+        data = existing_user.json()
+        return existing_user.status_code, data["detail"]
+
+    finally:
+        delete_user_by_email(valid_email, auth_headers)
 
 
 # ---------- Fixtures by field ----------
@@ -126,7 +141,7 @@ def signup_with_custom_role(auth_headers):
 
         resp = None
         try:
-            resp = _create_user(data, auth_headers, treat_duplicate_as_success=True)
+            resp = _create_user_signup(data, auth_headers, treat_duplicate_as_success=True)
             _assert_created_user_status(resp, 201, {"attempted_role": role})
             return get_user_by_email(test_email, auth_headers)
         finally:
@@ -148,7 +163,7 @@ def signup_with_valid_data(auth_headers):
     user_exist_skip(unique_email, auth_headers)
     resp = None
     try:
-        resp = _create_user(data, auth_headers, treat_duplicate_as_success=True)
+        resp = _create_user_signup(data, auth_headers, treat_duplicate_as_success=True)
         _assert_created_user_status(resp, 201, data)
         user = get_user_by_email(unique_email, auth_headers)
         yield user
@@ -179,7 +194,7 @@ def login_as_passenger(auth_headers):
 
     resp = None
     try:
-        resp = _create_user(data, auth_headers, treat_duplicate_as_success=True)
+        resp = _create_user_signup(data, auth_headers, treat_duplicate_as_success=True)
         _assert_created_user_status(resp, 201, data)
 
         user = get_user_by_email(unique_email, auth_headers)

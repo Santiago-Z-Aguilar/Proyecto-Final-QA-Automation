@@ -11,7 +11,7 @@ from API.utils.data import (
     valid_full_name,
 )
 from API.utils.settings import user_schema
-from API.tests.auth.conftest import login, login_as_passenger
+from API.tests.auth.conftest import login, login_as_passenger, signup_with_existing_user
 
 
 # ---------- Email tests ----------
@@ -55,6 +55,13 @@ class TestFullNameValidation:
                 f"Expected: {name_case['expected_user_created']} | Actual: {user['full_name']}\n"
             )
 
+def test_signup_with_existing_user(auth_headers):
+    status_code, detail = signup_with_existing_user(auth_headers)
+
+    assert status_code == 400
+    assert "already registered" in detail.lower(), (
+        f"Expected 'already registered' in error, but got '{detail}'"
+    )
 
 # ---------- Role assignment tests ----------
 def test_admin_role_converted_to_passenger(signup_with_custom_role):
