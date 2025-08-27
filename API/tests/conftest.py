@@ -4,8 +4,9 @@ from API.utils.settings import AUTH_LOGIN, AUTH_SIGN_UP
 from dotenv import load_dotenv
 import os
 import faker
-from API.utils.user_helpers import _create_user, _build_user_data
+from API.utils.user_helpers import _create_user, _build_user_data, delete_user_by_email
 from API.utils.api_helpers import api_request
+from API.utils.data import passenger_user_token_email
 
 load_dotenv()
 
@@ -44,7 +45,7 @@ def auth_headers(admin_token):
 
 @pytest.fixture(scope="session")
 def passenger_token(admin_token):
-    email = "passenger_token_jassy@test.com"
+    email = passenger_user_token_email
     user = email
     password = "PassengerPassword"
     full_name = "Passenger Token Jasy"
@@ -72,8 +73,13 @@ def passenger_token(admin_token):
     except (KeyError, ValueError):
         raise Exception(f"❌ Login failed. Unexpected Response: {response.text}")
 
-
-
 @pytest.fixture
 def passenger_headers(passenger_token):
+    """Fixture de test que da headers, depende del session para cleanup."""
     return {"Authorization": f"Bearer {passenger_token}"}
+
+@pytest.fixture(scope="session")
+def passenger_session_delete(auth_headers):
+    """Fixture de sesión que limpia al final."""
+    yield  # no retorna nada, solo marca el punto donde pytest espera
+    delete_user_by_email(passenger_user_token_email, auth_headers)
