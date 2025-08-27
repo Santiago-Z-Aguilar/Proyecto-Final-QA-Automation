@@ -10,8 +10,9 @@ from API.utils.data import (
     valid_password,
     valid_full_name,
 )
-from API.utils.settings import user_schema
-from API.tests.auth.conftest import login, login_as_passenger, signup_with_existing_user
+from API.utils.user_helpers import create_user_with_email_already_registered
+from API.utils.settings import user_schema, AUTH_SIGN_UP
+from API.tests.auth.conftest import login, login_as_passenger
 
 
 # ---------- Email tests ----------
@@ -55,8 +56,10 @@ class TestFullNameValidation:
                 f"Expected: {name_case['expected_user_created']} | Actual: {user['full_name']}\n"
             )
 
+
+# ---------- Existing user ----------
 def test_signup_with_existing_user(auth_headers):
-    status_code, detail = signup_with_existing_user(auth_headers)
+    status_code, detail = create_user_with_email_already_registered(auth_headers, AUTH_SIGN_UP, role='admin')
 
     assert status_code == 400
     assert "already registered" in detail.lower(), (

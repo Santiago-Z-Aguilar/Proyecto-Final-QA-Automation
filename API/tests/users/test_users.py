@@ -1,31 +1,13 @@
-# from requests import RequestException
-# from tests.users.conftest import user_fixture
-# from utils.settings import user_schema, USERS
-# import pytest
-# from jsonschema import validate
-# import time
-# from tests.conftest import auth_headers, api_request, admin_token
+from API.utils.user_helpers import create_user_with_email_already_registered
+from API.utils.settings import USERS
 
-# @pytest.mark.parametrize('user_fixture', ['admin'], indirect=True)
-# def test_create_admin_user(auth_headers, user_fixture):
-#     assert user_fixture["role"] == "admin"
-#     print(user_fixture)
-#
-#
-# @pytest.mark.parametrize('user_fixture', ['passenger'], indirect=True)
-# def test_create_passenger_user(auth_headers, user_fixture):
-#     assert user_fixture["role"] == "passenger"
-#     print(user_fixture)
-#
-# @pytest.mark.parametrize("user_fixture", ["admin"], indirect=True)
-# def test_validate_user_schema(user_fixture):
-#     admin_user = user_fixture
-#     assert admin_user["role"] == "admin"
-#
-#
-# def test_get_all_users(auth_headers):
-#     r = api_request("get", USERS, headers=auth_headers)
-#     print("⚠️ STATUS:", r.status_code)
-#     print("📨 BODY:", r.text)
-#     assert r.status_code == 200
+def test_create_user_as_admin(auth_headers, create_user_as_admin):
+    status_code, detail = create_user_as_admin
 
+    assert status_code == 201
+    assert "admin" in detail['role']
+
+# ---------- Existing user ----------
+def test_signup_with_existing_user(auth_headers):
+    status_code, detail = create_user_with_email_already_registered(auth_headers, USERS, role='admin')
+    assert status_code == 400

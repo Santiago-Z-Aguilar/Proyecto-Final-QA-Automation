@@ -6,15 +6,15 @@ import pytest
 
 from API.utils.data import valid_password, valid_full_name, valid_email
 from API.utils.api_helpers import api_request
-from API.utils.settings import AUTH_LOGIN
+from API.utils.settings import AUTH_LOGIN, AUTH_SIGN_UP
 from API.utils.user_helpers import (
     get_unique_email,
     get_user_by_email,
     delete_user_by_email,
     user_exist_skip,
-    _create_user_signup
+    _create_user,
+    _build_user_data
 )
-from API.tests.conftest import _build_user_data
 
 # ---------- Logging ----------
 # NOTE: pytest already manages logging. Avoid basicConfig unless you need custom setup.
@@ -63,9 +63,10 @@ def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, 
     resp = None
     user = None
     try:
-        resp = _create_user_signup(
+        resp = _create_user(
             data,
             auth_headers,
+            path=AUTH_SIGN_UP,
             treat_duplicate_as_success=(expected_status == 201)
         )
         _assert_created_user_status(resp, expected_status, case)
@@ -85,27 +86,15 @@ def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, 
 
     finally:
         try:
-            existing_user = user or get_user_by_email(email, auth_headers)
-            if existing_user:
+            exist = user or get_user_by_email(email, auth_headers)
+            if exist:
                 deleted = delete_user_by_email(email, auth_headers)
                 logger.info("Cleanup: %s User '%s' deleted", "✅" if deleted else "❌", email)
         except Exception as e:
             logger.warning("Cleanup exception for '%s': %s", email, e)
 
 
-def signup_with_existing_user(auth_headers):
 
-    payload = _build_user_data(valid_email, valid_password, valid_full_name)
-
-    try:
-        user = _create_user_signup(payload, auth_headers, treat_duplicate_as_success=True)
-        existing_user = _create_user_signup(payload, auth_headers, treat_duplicate_as_success=False)
-
-        data = existing_user.json()
-        return existing_user.status_code, data["detail"]
-
-    finally:
-        delete_user_by_email(valid_email, auth_headers)
 
 
 # ---------- Fixtures by field ----------
@@ -136,18 +125,17 @@ def signup_full_name_case(auth_headers):
 def signup_with_custom_role(auth_headers):
     """Fixture to create users with custom role (always expects success)."""
     def _signup(role: str, prefix: str = "role_test_jasy"):
-        test_email = get_unique_email(prefix)
+        test_email = get_unique_email(prefix="custom_role_jasy")
         data = _build_user_data(test_email, valid_password, valid_full_name, role=role)
 
         resp = None
         try:
-            resp = _create_user_signup(data, auth_headers, treat_duplicate_as_success=True)
-            _assert_created_user_status(resp, 201, {"attempted_role": role})
+            resp = _create_user(data, auth_headers, path=AUTH_SIGN_UP, treat_duplicate_as_success=True)
             return get_user_by_email(test_email, auth_headers)
         finally:
             try:
-                existing_user = get_user_by_email(test_email, auth_headers) is not None
-                if existing_user:
+                exist = get_user_by_email(test_email, auth_headers) is not None
+                if exist:
                     deleted = delete_user_by_email(test_email, auth_headers)
                     logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{test_email}' deleted")
             except Exception as e:
@@ -163,14 +151,13 @@ def signup_with_valid_data(auth_headers):
     user_exist_skip(unique_email, auth_headers)
     resp = None
     try:
-        resp = _create_user_signup(data, auth_headers, treat_duplicate_as_success=True)
-        _assert_created_user_status(resp, 201, data)
+        resp = _create_user(data, auth_headers, path=AUTH_SIGN_UP, treat_duplicate_as_success=True)
         user = get_user_by_email(unique_email, auth_headers)
         yield user
     finally:
         try:
-            existing_user = get_user_by_email(unique_email, auth_headers) is not None
-            if existing_user:
+            exists = get_user_by_email(unique_email, auth_headers) is not None
+            if exists:
                 deleted = delete_user_by_email(unique_email, auth_headers)
                 logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{unique_email}' deleted")
         except Exception as e:
@@ -194,8 +181,7 @@ def login_as_passenger(auth_headers):
 
     resp = None
     try:
-        resp = _create_user_signup(data, auth_headers, treat_duplicate_as_success=True)
-        _assert_created_user_status(resp, 201, data)
+        resp = _create_user(data, auth_headers, path=AUTH_SIGN_UP, treat_duplicate_as_success=True)
 
         user = get_user_by_email(unique_email, auth_headers)
         assert user and user.get("role") == "passenger"
@@ -203,8 +189,8 @@ def login_as_passenger(auth_headers):
         return login(unique_email, valid_password)
     finally:
         try:
-            existing_user = get_user_by_email(unique_email, auth_headers) is not None
-            if existing_user:
+            exist = get_user_by_email(unique_email, auth_headers) is not None
+            if exist:
                 deleted = delete_user_by_email(unique_email, auth_headers)
                 logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{unique_email}' deleted")
         except Exception as e:

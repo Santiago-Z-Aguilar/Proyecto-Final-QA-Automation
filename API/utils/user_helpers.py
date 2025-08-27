@@ -2,12 +2,14 @@
 
 import logging
 from uuid import uuid4
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from requests.models import Response
 from API.utils.api_helpers import api_request
+from API.utils.data import valid_password, valid_full_name
 from API.utils.settings import USERS, AUTH_SIGN_UP
 import pytest
 from time import sleep
+
 
 logger = logging.getLogger("qa_tests")
 
@@ -19,6 +21,13 @@ CLEANUP_DELAY = 1
 def get_unique_email(prefix: str = "test") -> str:
     """Generate a unique email address for testing."""
     return f"{prefix}_{uuid4().hex}@example.com"
+
+def _build_user_data(email: str, password: str, full_name: str, role: Optional[str] = None) -> Dict[str, Any]:
+    """Builds user creation payload."""
+    data = {"email": email, "password": password, "full_name": full_name}
+    if role is not None:
+        data["role"] = role
+    return data
 
 
 def get_user_by_email(email: str, auth_headers: Dict[str, str]) -> Optional[Dict]:
@@ -43,9 +52,10 @@ def user_exist_skip(email: str, auth_headers: Dict[str, str]) -> None:
         pytest.skip(f"User '{email}' already exists in database. Test skipped.")
 
 
-def _create_user_signup(
+def _create_user(
     payload: Dict,
     auth_headers: Dict[str, str],
+    path,
     max_retries: int = DEFAULT_RETRIES,
     treat_duplicate_as_success: bool = True,
 ) -> Response:
@@ -63,7 +73,7 @@ def _create_user_signup(
     last_resp: Optional[Response] = None
 
     for attempt in range(1, max_retries + 1):
-        resp = api_request("post", AUTH_SIGN_UP, json=payload, headers=auth_headers)
+        resp = api_request("post", path, json=payload, headers=auth_headers)
         last_resp = resp
 
         if resp is None:
@@ -91,11 +101,26 @@ def _create_user_signup(
 
     return last_resp
 
-def create_user_as_admin(auth_headers, payload):
-    resp = api_request("post", USERS, json=payload, headers=auth_headers)
-    return resp.json()
 
+def create_user_with_email_already_registered(auth_headers, ENDPOINT, role: Optional[str]):
+    unique_email = get_unique_email(prefix="registered_jasy")
+    payload = _build_user_data(email=unique_email, password=valid_password, full_name=valid_full_name, role=role)
 
+    try:
+        user = _create_user(payload,
+                            auth_headers,
+                            path=ENDPOINT,
+                            treat_duplicate_as_success=True)
+        exist = _create_user(payload,
+                                     auth_headers,
+                                     path=ENDPOINT,
+                                     treat_duplicate_as_success=False)
+
+        data = exist.json()
+        return exist.status_code, data["detail"]
+
+    finally:
+        delete_user_by_email(unique_email, auth_headers)
 
 
 def delete_user_by_email(email: str, auth_headers: Dict[str, str]) -> bool:

@@ -1,5 +1,5 @@
 # tests/conftest.py
-from typing import Any, Dict, Optional
+
 from API.utils.settings import AUTH_LOGIN
 from dotenv import load_dotenv
 import os
@@ -15,29 +15,6 @@ import logging
 import pytest
 
 logger = logging.getLogger("qa_tests")
-
-# ---------- Helpers ----------
-
-def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
-    """
-    Emit a clear error log whenever a test fails, with nodeid and a short traceback.
-    This complements assertion-local logging and helps when failures happen outside our asserts.
-    """
-    report = pytest.TestReport.from_item_and_call(item, call)
-    if report.when in ("call", "setup", "teardown") and report.failed:
-        # Short style keeps output compact; change to 'long' if you want full trace here.
-        short_tb = call.excinfo.getrepr(style="short") if call.excinfo else "<no excinfo>"
-        logger.error("TEST FAILED: %s\n%s", item.nodeid, short_tb)
-    return report
-
-
-
-def _build_user_data(email: str, password: str, full_name: str, role: Optional[str] = None) -> Dict[str, Any]:
-    """Builds user creation payload."""
-    data = {"email": email, "password": password, "full_name": full_name}
-    if role is not None:
-        data["role"] = role
-    return data
 
 
 # ---------- Fixtures ----------
@@ -62,8 +39,8 @@ def admin_token():
 def auth_headers(admin_token):
     return {"Authorization": f"Bearer {admin_token}"}
 
-def test_auth_headers(admin_token):
-    r = admin_token
-    return r
+# def test_auth_headers(admin_token):
+#     r = admin_token
+#     return r
 
 
