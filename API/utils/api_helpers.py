@@ -5,7 +5,7 @@ import time
 import logging
 from API.utils.settings import BASE_URL
 
-RETRIES = 15  # Max retry attempts
+RETRIES = 30  # Max retry attempts
 DELAY = 1  # Delay between retries in seconds
 DEFAULT_TIMEOUT = 20  # Request timeout in seconds
 RETRY_STATUS_CODES = {500}  # Only retry on these status codes
