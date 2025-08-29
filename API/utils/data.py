@@ -122,3 +122,33 @@ full_names_to_test = [
     for item in raw_full_names
 ]
 
+# ========== TAIL NUMBERS ==========
+
+valid_tail_number = "PY-7162A"
+min_valid_tail_number = "AR-524"
+empty_tail_number = ""
+tail_number_with_accents = "ÁR-524"
+tail_number_with_apostrophe = "A'R-524"
+tail_number_with_space = "AR 524"
+below_max_tail_number = "AR-524ARA"
+max_tail_number = "AR-524ARAR"
+above_max_tail_number = "AR-524ARARA"
+symbols_only_tail_number = "@#$%^&*"
+unicode_tail_number = "李雷-李雷李雷"
+spaces_only_tail_number = "   "
+
+tail_numbers_to_test = [
+    {"tail_number": valid_tail_number, "expected_status": 201},
+    {"tail_number": min_valid_tail_number, "expected_status": 201},
+    {"tail_number": empty_tail_number, "expected_status": 422},
+    {"tail_number": tail_number_with_accents, "expected_status": 422},
+    {"tail_number": tail_number_with_apostrophe, "expected_status": 422},
+    {"tail_number": tail_number_with_space, "expected_status": 201},
+    {"tail_number": below_max_tail_number, "expected_status": 201},
+    {"tail_number": max_tail_number, "expected_status": 201},
+    {"tail_number": above_max_tail_number, "expected_status": 422},
+    {"tail_number": symbols_only_tail_number, "expected_status": 422},
+    {"tail_number": unicode_tail_number, "expected_status": 422},
+    {"tail_number": spaces_only_tail_number, "expected_status": 422},
+]
+

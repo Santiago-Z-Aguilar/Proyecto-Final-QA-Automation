@@ -8,9 +8,11 @@ import pytest
 
 
 @pytest.fixture
-def create_aircraft(auth_headers):
-    aircraft = {"tail_number": "unodostres",
-                "model": "modelon",
-                "capacity": 500}
-    response = api_request("post", AIRCRAFTS, headers=auth_headers, json=aircraft)
-    return response
+def create_aircraft_tail_number_case(auth_headers):
+    def _create_aircraft_tail_number(case):
+        aircraft = {"tail_number": case["tail_number"],
+                    "model": "modelon",
+                    "capacity": 500}
+        response = api_request("post", AIRCRAFTS, headers=auth_headers, json=aircraft)
+        return response
+    return _create_aircraft_tail_number
