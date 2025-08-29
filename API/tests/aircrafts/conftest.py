@@ -4,16 +4,11 @@ from API.utils.settings import AIRCRAFTS
 import pytest
 
 
-#def _create_aircraft(auth_headers):
-
 def _create_aircraft_case(case,auth_headers):
     tail_number = case.get("tail_number",valid_tail_number)
     capacity = case.get("capacity",valid_capacity)
     model = case.get("model",valid_model)
-    aircraft = \
-        {"tail_number": tail_number,
-                    "model": model,
-                    "capacity": capacity}
+    aircraft = {"tail_number": tail_number,"model": model,"capacity": capacity}
     response = api_request("post", AIRCRAFTS, headers=auth_headers, json=aircraft)
     return response
 
