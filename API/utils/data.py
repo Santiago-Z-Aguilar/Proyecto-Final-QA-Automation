@@ -152,3 +152,24 @@ tail_numbers_to_test = [
     {"tail_number": spaces_only_tail_number, "expected_status": 422},
 ]
 
+# ========== CAPACITIES ==========
+
+valid_capacity = 200
+negative_capacity = -200
+zero_capacity = 0
+
+capacities_to_test = [
+    {"capacity": valid_capacity, "expected_status": 201},
+    {"capacity": negative_capacity, "expected_status": 422},
+    {"capacity": zero_capacity, "expected_status": 422}
+]
+
+# ========== MODELS ==========
+
+valid_model = "Airbus A320-200"
+empty_model = ""
+
+models_to_test = [
+    {"model": valid_model, "expected_status": 201},
+    {"model": empty_model, "expected_status": 422},
+]
