@@ -36,3 +36,13 @@ user_schema = {
     "additionalProperties": True
 }
 
+aircraft_schema = {
+    "type": "object",
+    "required": ["tail_number","model","capacity","id"],
+    "properties": {
+        "tail_number": {"type": "string"},
+        "model": {"type": "string"},
+        "capacity": {"type": "integer"},
+        "id": {"type": "string"},
+    }
+}

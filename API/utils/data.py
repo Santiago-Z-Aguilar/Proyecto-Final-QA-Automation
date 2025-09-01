@@ -157,11 +157,13 @@ tail_numbers_to_test = [
 valid_capacity = 200
 negative_capacity = -200
 zero_capacity = 0
+wrong_capacity_type = "abc"
 
 capacities_to_test = [
     {"capacity": valid_capacity, "expected_status": 201},
     {"capacity": negative_capacity, "expected_status": 422},
-    {"capacity": zero_capacity, "expected_status": 422}
+    {"capacity": zero_capacity, "expected_status": 422},
+    {"capacity": wrong_capacity_type, "expected_status": 422},
 ]
 
 # ========== MODELS ==========
@@ -173,3 +175,19 @@ models_to_test = [
     {"model": valid_model, "expected_status": 201},
     {"model": empty_model, "expected_status": 422},
 ]
+
+aircraft_cases = tail_numbers_to_test + models_to_test + capacities_to_test
+
+
+# ========== PAGINATION VALUES ==========
+
+pagination_values_to_test = [
+    {"skip": 0, "limit":10, "expected_status": 200},
+    {"skip": 5, "limit":0, "expected_status": 200},
+    {"skip": "abc", "limit":0, "expected_status": 422},
+    {"skip": 0, "limit": "abc", "expected_status": 422},
+]
+
+
+
+
