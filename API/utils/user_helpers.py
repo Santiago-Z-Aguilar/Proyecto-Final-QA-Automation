@@ -33,17 +33,29 @@ def _build_user_data(email: str, password: str, full_name: str, role: Optional[s
 
 def get_user_by_email(email: str, auth_headers: Dict[str, str]) -> Optional[Dict]:
     """
-    Returns user dict if exists, None otherwise.
-    Safer against None responses or unexpected codes.
+    Busca por email paginando /users?skip=&limit= hasta encontrar o agotar resultados.
     """
-    resp: Optional[Response] = api_request("get", USERS, headers=auth_headers)
-    if resp is None or resp.status_code != 200:
-        return None
-    try:
-        users: list = resp.json()
-    except Exception:
-        return None
-    return next((user for user in users if user.get("email") == email), None)
+    PAGE = 50
+    skip = 0
+    while True:
+        resp = api_request("get", USERS, headers=auth_headers, params={"skip": skip, "limit": PAGE})
+        if resp is None or resp.status_code != 200:
+            return None
+        try:
+            batch = resp.json()
+        except Exception:
+            return None
+
+        if not batch:
+            return None
+
+        for u in batch:
+            if u.get("email") == email:
+                return u
+
+        if len(batch) < PAGE:
+            return None
+        skip += PAGE
 
 
 def user_exist_skip(email: str, auth_headers: Dict[str, str]) -> None:
