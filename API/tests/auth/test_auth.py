@@ -4,42 +4,44 @@ import os
 import pytest
 from jsonschema import validate
 from API.utils.data import (
-    emails_to_test,
-    passwords_to_test,
-    full_names_to_test,
     valid_password,
     valid_full_name,
 )
-from API.utils.settings import user_schema
+from API.tests.auth.data_auth import emails_to_test_signup, passwords_to_test_signup, full_names_to_test_signup
+from API.utils.user_helpers import create_user_with_email_already_registered
+from API.utils.settings import user_schema, AUTH_SIGN_UP
 from API.tests.auth.conftest import login, login_as_passenger
 
 
 # ---------- Email tests ----------
 class TestEmailValidation:
-    @pytest.mark.parametrize("email_case", emails_to_test)
-    def test_email_validation(self, signup_email_case, email_case):
+
+    @pytest.mark.parametrize("email, expected_status", emails_to_test_signup.items())
+    def test_email_validation(self, signup_email_case, email, expected_status):
         signup_email_case({
-            "email": email_case["email"],
+            "email": email,
             "password": valid_password,
             "full_name": valid_full_name,
-            "expected_status": email_case["expected_status"]
+            "expected_status": expected_status,
         })
+        # print(signup_email_case.data)
 
 
 # ---------- Password tests ----------
 class TestPasswordValidation:
-    @pytest.mark.parametrize("password_case", passwords_to_test)
-    def test_password_validation(self, signup_password_case, password_case):
+
+    @pytest.mark.parametrize("password, expected_status", passwords_to_test_signup.items())
+    def test_password_validation(self, signup_password_case, password, expected_status):
         signup_password_case({
-            "password": password_case["password"],
+            "password": password,
             "full_name": valid_full_name,
-            "expected_status": password_case["expected_status"]
+            "expected_status": expected_status,
         })
 
 
 # ---------- Full name tests ----------
 class TestFullNameValidation:
-    @pytest.mark.parametrize("name_case", full_names_to_test)
+    @pytest.mark.parametrize("name_case", full_names_to_test_signup)
     def test_name_validation(self, signup_full_name_case, name_case):
         case_data = {
             "full_name": name_case["full_name"],
@@ -55,6 +57,15 @@ class TestFullNameValidation:
                 f"Expected: {name_case['expected_user_created']} | Actual: {user['full_name']}\n"
             )
 
+
+# ---------- Existing user ----------
+def test_signup_with_existing_user(auth_headers):
+    status_code, detail = create_user_with_email_already_registered(auth_headers, AUTH_SIGN_UP, role='admin')
+
+    assert status_code == 400
+    assert "already registered" in detail.lower(), (
+        f"Expected 'already registered' in error, but got '{detail}'"
+    )
 
 # ---------- Role assignment tests ----------
 def test_admin_role_converted_to_passenger(signup_with_custom_role):

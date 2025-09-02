@@ -10,6 +10,7 @@ USERS = "/users/"
 AIRCRAFTS = "/aircrafts"
 
 MAX_WAIT_SECONDS = 60
+USERS_ME = "/users/me"
 
 fake = faker.Faker()
 

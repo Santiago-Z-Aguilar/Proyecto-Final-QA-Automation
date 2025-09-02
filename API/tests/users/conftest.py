@@ -1,131 +1,143 @@
+# tests/users/conftest.py
+from API.utils.api_helpers import api_request
+from API.utils.data import valid_password, valid_full_name, admin_role, passenger_role
+from API.utils.user_helpers import _create_user, _build_user_data, delete_user_by_email, get_unique_email, \
+    get_user_by_email
+from API.utils.settings import USERS
+from typing import List, Dict
+import pytest
+import logging
+
+logger = logging.getLogger("Endpoint_USERS")
+
+@pytest.fixture
+def create_user_as_admin(auth_headers):
+    """Fixture to create users as administrator with automatic cleanup."""
+    created_users = []
+
+    def _create_user_fixture(
+            email: str = None,
+            role: str = admin_role,
+            password: str = valid_password,
+            full_name: str = valid_full_name,
+            **kwargs  # Additional arguments for _create_user
+    ):
+        # Generate unique email if not provided
+        user_email = email or get_unique_email(prefix="admin_user_jasy")
+
+        # Build and send payload
+        payload = _build_user_data(user_email, password, full_name, role)
+        response = _create_user(payload, auth_headers, path=USERS, **kwargs)
+
+        # Register user for cleanup only if creation was successful (201) or duplicate treated as success
+        if response.status_code in [200, 201]:
+            created_users.append(user_email)
+
+        return response.status_code, response.json()
+
+    yield _create_user_fixture
+
+    # Cleanup: delete all successfully created users
+    for email in created_users:
+        try:
+            delete_user_by_email(email, auth_headers)
+            logging.info(f"User {email} successfully deleted")
+        except Exception as e:
+            logging.warning(f"Failed to delete user {email}: {e}")
 
 
+@pytest.fixture
+def create_user_as_passenger(auth_headers, passenger_headers):
+    """Fixture to create users as passenger with automatic cleanup."""
+    created_users = []
+
+    def _create_user_fixture(
+            email: str = None,
+            role: str = passenger_role,
+            password: str = valid_password,
+            full_name: str = valid_full_name,
+            **kwargs  # Additional arguments for _create_user
+    ):
+        # Generate unique email if not provided
+        user_email = email or get_unique_email(prefix="passenger_user_jasy")
+
+        # Build and send payload
+        payload = _build_user_data(user_email, password, full_name, role)
+        response = _create_user(payload, passenger_headers, path=USERS, **kwargs)
+
+        # Register user for cleanup only if creation was successful (201) or duplicate treated as success
+        if response.status_code in [200, 201]:
+            created_users.append(user_email)
+
+        return response.status_code, response.json()
+
+    yield _create_user_fixture
+
+    # Cleanup: delete all successfully created users using admin privileges
+    for email in created_users:
+        try:
+            delete_user_by_email(email, auth_headers)
+            logging.info(f"User {email} successfully deleted")
+        except Exception as e:
+            logging.warning(f"Failed to delete user {email}: {e}")
 
 
+@pytest.fixture()
+def create_user_without_authentication():
+    """Fixture to create users without_authentication. No cleanup needed."""
+    # Generate unique email if not provided
+    user_email = get_unique_email(prefix="without_authentication_jasy")
+
+    # Build and send payload
+    payload = _build_user_data(user_email, password=valid_password, full_name=valid_full_name, role=None)
+
+    resp = _create_user(payload, path=USERS)
+    return resp.status_code, resp.json()
 
 
+# ---------- Helpers de tests de get ----------
+@pytest.fixture(scope="session")
+def seed_15_passengers(auth_headers):
+    created = []  # (email, id)
+    try:
+        for _ in range(15):
+            email = get_unique_email(prefix="bulk_passenger")
+            payload = _build_user_data(email, valid_password, valid_full_name, passenger_role)
+            resp = _create_user(payload, auth_headers, path=USERS, treat_duplicate_as_success=True)
+
+            if resp is None:
+                raise RuntimeError("api_request devolvió None al crear usuario")
+
+            if resp.status_code in (200, 201):
+                data = resp.json()
+            elif resp.status_code == 400 and "already registered" in resp.text.lower():
+                # Con el fix de get_user_by_email paginado, _create_user normalmente devolverá 201 sintético.
+                # Si aún llega 400 aquí, forzamos la búsqueda y continuamos.
+                user = get_user_by_email(email, auth_headers)
+                if not user:
+                    raise AssertionError(f"Duplicado reportado pero no encontrado en listado para {email}")
+                data = {"id": user["id"], "email": email}
+            else:
+                raise AssertionError(f"Error creando usuario: {resp.status_code} {getattr(resp, 'text','')}")
+
+            uid = data.get("id")
+            if not uid:
+                # Fallback extra por si la respuesta no trae id
+                user = get_user_by_email(email, auth_headers)
+                if not user or not user.get("id"):
+                    raise AssertionError(f"No se pudo obtener id para {email}")
+                uid = user["id"]
+
+            created.append((email, uid))
+
+        # Si llegamos aquí, ya hay 15 creados
+        yield [email for (email, _) in created]
+
+    finally:
+        # Cleanup SIEMPRE corre, aunque falle arriba
+        for email, uid in created:
+            resp = api_request("DELETE", f"{USERS.rstrip('/')}/{uid}", headers=auth_headers)
+            ok = bool(resp and resp.status_code in (200, 202, 204))
+            logger.info(f"Cleanup {'✅' if ok else '❌'} {email} ({uid}) -> {resp and resp.status_code}")
 
 
-
-
-
-
-
-
-# import uuid
-# import pytest
-# import time
-# from faker import Faker
-# from utils.settings import USERS
-# from utils.api_helpers import api_request
-#
-# fake = Faker()
-#
-#
-# def delete_user_by_email(email: str, auth_headers) -> bool:
-#     """
-#     Busca usuarios con el email dado y elimina cada uno encontrado.
-#     Retorna True si todos fueron eliminados exitosamente, False si falló o no encontró.
-#     """
-#     # Obtener todos los usuarios para buscar el id del que tenga el email
-#     response = api_request("get", USERS, headers=auth_headers)
-#     if response is None or response.status_code != 200:
-#         print(f"❌ No se pudo obtener la lista de usuarios para eliminar email {email}")
-#         return False
-#
-#     users = response.json()
-#     # Filtrar usuarios con el email dado (normalmente solo uno)
-#     users_to_delete = [u for u in users if u.get("email") == email]
-#
-#     if not users_to_delete:
-#         print(f"ℹ️ No se encontró usuario con email {email} para eliminar.")
-#         return True  # No hay usuario, está limpio
-#
-#     all_deleted = True
-#     for user in users_to_delete:
-#         user_id = user.get("id")
-#         if not user_id:
-#             continue
-#
-#         del_response = api_request("delete", f"{USERS}{user_id}", headers=auth_headers)
-#         if del_response is None or del_response.status_code != 204:
-#             print(f"⚠️ Falló eliminar usuario {email} (ID: {user_id}), status: {del_response.status_code if del_response else 'None'}")
-#             all_deleted = False
-#             continue
-#
-#         # Esperar a que se confirme la eliminación
-#         if not wait_until_user_deleted(user_id, auth_headers):
-#             print(f"❌ Usuario {email} (ID: {user_id}) sigue existiendo tras varios intentos.")
-#             all_deleted = False
-#
-#     return all_deleted
-#
-#
-#
-#
-# @pytest.fixture
-# def create_user():
-#     def _create_user(auth_headers, role="admin"):
-#         email = f"test_{uuid.uuid4()}@example.com"
-#
-#         # Limpieza previa para evitar conflicto
-#         delete_user_by_email(email, auth_headers)
-#
-#         user_data = {
-#             "email": email,
-#             "password": "Test1234!",
-#             "full_name": "Artya2",
-#             "role": role
-#         }
-#
-#         print(f"📤 Attempt to create user with email: {user_data['email']}")
-#         response = api_request(
-#             "post",
-#             USERS,
-#             headers=auth_headers,
-#             json=user_data,
-#             retry_400=True
-#         )
-#
-#         if response is None:
-#             raise Exception("❌ No se pudo crear el usuario después de varios intentos.")
-#
-#         if response.status_code >= 400:
-#             print(f"❌ Error al crear usuario: {response.status_code} - {response.text}")
-#             raise Exception(f"❌ Error al crear usuario. Status: {response.status_code}")
-#
-#         return response.json()
-#
-#     return _create_user
-#
-#
-# @pytest.fixture
-# def user_fixture(request, auth_headers, create_user):
-#     role = getattr(request, "param", "admin")
-#     user = create_user(auth_headers, role)
-#     yield user
-#
-#     # Intentar eliminar usuario
-#     try:
-#         delete_response = api_request("delete", f"{USERS}{user['id']}", headers=auth_headers)
-#         if delete_response and delete_response.status_code == 204:
-#             print(f"✅ User deleted: {user['email']}")
-#
-#             # Confirmar que el usuario fue eliminado realmente
-#             if not wait_until_user_deleted(user['id'], auth_headers):
-#                 print(f"❌ Usuario {user['email']} sigue existiendo después de varios intentos.")
-#         else:
-#             print(
-#                 f"⚠️ Falló eliminar usuario {user['email']} (Status: {delete_response.status_code if delete_response else 'no response'})")
-#     except Exception as e:
-#         print(f"❌ Exception durante eliminación de usuario: {e}")
-#
-#
-# def wait_until_user_deleted(user_id, auth_headers, max_attempts=5, wait_seconds=1):
-#     for attempt in range(max_attempts):
-#         response = api_request("get", f"{USERS}{user_id}", headers=auth_headers)
-#         if response.status_code == 404:
-#             return True
-#         print(f"⚠️ Usuario todavía existe (intento {attempt + 1}/{max_attempts}), esperando {wait_seconds}s...")
-#         time.sleep(wait_seconds)
-#     return False
