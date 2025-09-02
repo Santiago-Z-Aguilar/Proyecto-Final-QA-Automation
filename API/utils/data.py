@@ -188,6 +188,30 @@ pagination_values_to_test = [
     {"skip": 0, "limit": "abc", "expected_status": 422},
 ]
 
+# ========== DATE-TIME ==========
 
+valid_date_time = "2025-09-02T18:10:15"
+no_t_separator_date_time = "2025-09-0218:10:15"
+space_separator_date_time = "2025-09-02 18:10:15"
+lower_t_separator_date_time = "2025-09-02t18:10:15"
+Z_timezone_date_time = "2025-09-02T18:10:15Z"
+A_timezone_date_time = "2025-09-02T18:10:15A"
+offset_timezone_date_time = "2025-09-02T18:10:15+2:00"
+decimal_seconds_date_time = "2025-09-02T18:10:15.225"
+slash_date_time = "2025/09/02T18:10:15"
+single_digit_day_date_time = "2025-09-2T18:10:15"
+
+date_time_values_to_test = [
+    {"date_time": valid_date_time, "expected_status": 201},
+    {"date_time": no_t_separator_date_time, "expected_status": 422},
+    {"date_time": space_separator_date_time, "expected_status": 201},
+    {"date_time": lower_t_separator_date_time, "expected_status": 201},
+    {"date_time": Z_timezone_date_time, "expected_status": 201},
+    {"date_time": A_timezone_date_time, "expected_status": 422},
+    {"date_time": offset_timezone_date_time, "expected_status": 201},
+    {"date_time": decimal_seconds_date_time, "expected_status": 201},
+    {"date_time": slash_date_time, "expected_status": 422},
+    {"date_time": single_digit_day_date_time, "expected_status": 422},
+]
 
 
