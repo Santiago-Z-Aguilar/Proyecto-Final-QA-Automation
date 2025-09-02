@@ -15,7 +15,7 @@ fake = faker.Faker()
 import logging
 import pytest
 
-logger = logging.getLogger("qa_tests")
+logger = logging.getLogger("Token_tests")
 
 
 # ---------- Admin_token ----------
@@ -36,7 +36,7 @@ def admin_token():
     except (KeyError, ValueError):
         raise Exception(f"❌ Login failed. Unexpected Response: {response.text}")
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def auth_headers(admin_token):
     return {"Authorization": f"Bearer {admin_token}"}
 
@@ -76,7 +76,7 @@ def passenger_token(admin_token):
         # Cleanup después de que todas las pruebas usen el token
         delete_user_by_email(passenger_user_token_email, admin_headers)
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def passenger_headers(passenger_token):
     """Fixture de test que da headers, depende del session para cleanup."""
     return {"Authorization": f"Bearer {passenger_token}"}

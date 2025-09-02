@@ -5,10 +5,9 @@ import faker
 AIRPORT = "/airports/"
 AUTH_LOGIN = "/auth/login/"
 AUTH_SIGN_UP= "/auth/signup"
-BASE_URL = "https://cf-automation-airline-api.onrender.com"
+BASE_URL = "http://localhost:8000"
 USERS = "/users/"
-
-MAX_WAIT_SECONDS = 60
+USERS_ME = "/users/me"
 
 fake = faker.Faker()
 

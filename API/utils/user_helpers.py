@@ -15,7 +15,7 @@ from time import sleep
 logger = logging.getLogger("qa_tests")
 
 # Constants
-DEFAULT_RETRIES = 3
+DEFAULT_RETRIES = 5
 CLEANUP_DELAY = 1
 
 
