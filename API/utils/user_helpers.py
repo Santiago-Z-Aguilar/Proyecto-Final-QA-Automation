@@ -64,7 +64,6 @@ def user_exist_skip(email: str, auth_headers: Dict[str, str]) -> None:
     if existing_user:
         pytest.skip(f"User '{email}' already exists in database. Test skipped.")
 
-
 def _create_user(
     payload: Dict,
     auth_headers: Optional[Dict[str, str]] = None,
@@ -74,6 +73,7 @@ def _create_user(
 ) -> Response:
     """
     Handles user creation with duplicate resilience.
+    - If payload doesn't include 'email': send POST as-is (no duplicate handling).
     - On 400 "already registered":
       - If user exists:
         - If treat_duplicate_as_success=True: return synthetic 201.
@@ -82,6 +82,12 @@ def _create_user(
     - Other codes are returned as-is.
     - 500 handling is assumed in api_request.
     """
+    path = path or USERS
+
+    if "email" not in payload or payload.get("email") is None:
+        return api_request("post", path, json=payload, headers=auth_headers)
+    # -------------------------------------------------------------------------------
+
     email = payload["email"]
     last_resp: Optional[Response] = None
 
@@ -95,7 +101,7 @@ def _create_user(
         if resp.status_code == 201:
             return resp
 
-        if resp.status_code == 400 and "already registered" in resp.text.lower():
+        if resp.status_code == 400 and "already" in resp.text.lower() and "register" in resp.text.lower():
             logger.warning("User already registered; fetching existing user to synthesize 201.")
             existing_user = get_user_by_email(email, auth_headers)
             if existing_user:
@@ -105,19 +111,18 @@ def _create_user(
                     bug400._content = json.dumps({
                         "message": "user_already_exists",
                         "email": email,
-                        "role": existing_user.get("role") or payload.get("role"),  # 👈 clave
+                        "role": existing_user.get("role") or payload.get("role"),
                         "id": existing_user.get("id"),
                     }).encode("utf-8")
                     bug400.headers["Content-Type"] = "application/json"
                     bug400.encoding = "utf-8"
                     return bug400
                 return resp
-            continue  # retry
+            continue
 
         return resp
 
     return last_resp
-
 
 def create_user_with_email_already_registered(auth_headers, ENDPOINT, role: Optional[str]):
     unique_email = get_unique_email(prefix="registered_jasy")
@@ -156,4 +161,20 @@ def delete_user_by_email(email: str, auth_headers: Dict[str, str]) -> bool:
         return True
     else:
         logger.error(f" User not deleted '{email}'")
+    return False
+
+
+def delete_user_by_id(user_id: str, auth_headers: Dict[str, str]) -> bool:
+    """
+    Delete user by id.
+    Retorna True si el DELETE devolvió 204, False en cualquier otro caso.
+    """
+    from requests.models import Response
+    resp: Response = api_request("delete", f"{USERS.rstrip('/')}/{user_id}", headers=auth_headers)
+    if resp and resp.status_code == 204:
+        logger.info(f" Deleted user id '{user_id}'")
+        sleep(CLEANUP_DELAY)
+        return True
+    else:
+        logger.error(f" User not deleted by id '{user_id}'. Status: {resp and resp.status_code}")
     return False
