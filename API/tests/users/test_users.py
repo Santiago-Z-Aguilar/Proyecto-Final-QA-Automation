@@ -9,6 +9,7 @@ from API.utils.api_helpers import api_request
 
 # ---------- POST ----------
 class TestPostUsers:
+
     def test_user_with_email_already_registered(self, auth_headers):
         status_code, detail = create_user_with_email_already_registered(auth_headers, USERS, role='admin')
         assert status_code == 400
@@ -96,7 +97,6 @@ class TestPostUsers:
 
 # ---------- GET ----------
 class TestGetUsers:
-    """Suite de pruebas para endpoints GET de /users y /users/me."""
 
     def test_list_users_default_pagination(self, auth_headers, seed_15_passengers, users_get):
         resp = users_get(headers=auth_headers)
