@@ -160,12 +160,12 @@ class TestGetUsers:
 # ---------- PUT ----------
 class TestPutUsers:
 
-    def test_update_user_with_valid_data_as_admin(self, create_user_as_admin, do_update, auth_headers):
+    def test_update_user_with_valid_data_as_admin(self, create_user_as_admin, update, auth_headers):
         email = get_unique_email(prefix="user_to_upd")
         sc, detail = create_user_as_admin(email=email, role=passenger_role )
         uid = detail["id"]
 
-        resp = do_update(uid, valid_update_payload, auth_headers)
+        resp = update(uid, valid_update_payload, auth_headers)
         assert resp.status_code == 200, resp.text
         body = resp.json()
         assert body["id"] == uid
@@ -174,26 +174,26 @@ class TestPutUsers:
         assert "password" not in body
         assert body["role"] == passenger_role
 
-    def test_update_user_with_invalid_email(self, create_user_as_admin, do_update, auth_headers):
+    def test_update_user_with_invalid_email(self, create_user_as_admin, update, auth_headers):
         sc, detail = create_user_as_admin(role=passenger_role)
         uid = detail["id"]
 
-        resp = do_update(uid, invalid_email_payload, auth_headers)
+        resp = update(uid, invalid_email_payload, auth_headers)
         assert resp.status_code == 422, f"Esperado 422, recibido {resp.status_code}: {resp.text}"
         det = resp.json().get("detail", [])
         assert isinstance(det, list) and det
         assert ("@-sign" in det[0].get("msg", "")) or ("valid email" in det[0].get("msg", ""))
 
-    def test_update_non_existent_user_id(self, fake_user_id, do_update, auth_headers):
-        resp = do_update(fake_user_id, valid_update_payload, auth_headers)
+    def test_update_non_existent_user_id(self, fake_user_id, update, auth_headers):
+        resp = update(fake_user_id, valid_update_payload, auth_headers)
         assert resp.status_code == 404, f"Esperado 404, recibido {resp.status_code}: {resp.text}"
         assert resp.json().get("detail", "").lower() in ("not found", "no encontrado")
 
-    def test_update_user_role_as_admin(self, create_user_as_admin, do_update, auth_headers):
+    def test_update_user_role_as_admin(self, create_user_as_admin, update, auth_headers):
         sc, detail = create_user_as_admin(role=passenger_role)
         uid = detail["id"]
 
-        resp = do_update(uid, update_role_payload, auth_headers)
+        resp = update(uid, update_role_payload, auth_headers)
         assert resp.status_code == 200, resp.text
         body = resp.json()
         assert body["email"] == update_role_payload["email"]
@@ -201,11 +201,11 @@ class TestPutUsers:
         assert body["role"] == passenger_role
         print(body)
 
-    def test_update_user_as_passenger_forbidden(self, create_user_as_admin, do_update, passenger_headers):
+    def test_update_user_as_passenger_forbidden(self, create_user_as_admin, update, passenger_headers):
         sc, detail = create_user_as_admin(role=passenger_role)
         uid = detail["id"]
 
-        resp = do_update(uid, valid_update_payload, headers=passenger_headers)
+        resp = update(uid, valid_update_payload, headers=passenger_headers)
         assert resp.status_code == 403, f"Esperado 403, recibido {resp.status_code}: {resp.text}"
         assert resp.json().get("detail") in ("Forbidden", "Admin privileges required")
 

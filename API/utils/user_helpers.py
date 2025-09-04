@@ -23,12 +23,31 @@ def get_unique_email(prefix: str = "test") -> str:
     """Generate a unique email address for testing."""
     return f"{prefix}_{uuid4().hex}@example.com"
 
-def _build_user_data(email: str, password: str, full_name: str, role: Optional[str] = None) -> Dict[str, Any]:
-    """Builds user creation payload."""
-    data = {"email": email, "password": password, "full_name": full_name}
+def _build_user_data(
+    email: str | None = None,
+    password: str | None = None,
+    full_name: str | None = None,
+    role: str | None = None,
+    *,
+    default_prefix: str = "user",
+) -> dict:
+    """
+    Construye el payload de usuario.
+    - None  -> omite el campo en el JSON.
+    - Valor -> usa el valor literal (incluye "").
+    """
+    payload = {}
+
+    if email is not None:
+        payload["email"] = email
+    if password is not None:
+        payload["password"] = password
+    if full_name is not None:
+        payload["full_name"] = full_name
     if role is not None:
-        data["role"] = role
-    return data
+        payload["role"] = role
+
+    return payload
 
 
 def get_user_by_email(email: str, auth_headers: Dict[str, str]) -> Optional[Dict]:
@@ -154,7 +173,7 @@ def delete_user_by_email(email: str, auth_headers: Dict[str, str]) -> bool:
     if not user:
         return False
 
-    resp: Response = api_request("DELETE", f"{USERS}{user['id']}", headers=auth_headers)
+    resp = api_request("DELETE", f"{USERS}{user['id']}", headers=auth_headers)
     if resp.status_code == 204:
         logger.info(f" Deleted user '{email}'")
         sleep(CLEANUP_DELAY)
@@ -170,11 +189,11 @@ def delete_user_by_id(user_id: str, auth_headers: Dict[str, str]) -> bool:
     Retorna True si el DELETE devolvió 204, False en cualquier otro caso.
     """
     from requests.models import Response
-    resp: Response = api_request("delete", f"{USERS.rstrip('/')}/{user_id}", headers=auth_headers)
+    resp = api_request("delete", f"{USERS.rstrip('/')}/{user_id}", headers=auth_headers)
     if resp and resp.status_code == 204:
         logger.info(f" Deleted user id '{user_id}'")
         sleep(CLEANUP_DELAY)
         return True
     else:
-        logger.error(f" User not deleted by id '{user_id}'. Status: {resp and resp.status_code}")
+        logger.error(f" User not deleted by id '{user_id}'. Status: {resp.status_code and resp.json}")
     return False
