@@ -78,48 +78,6 @@ def _signup_case(case: Dict[str, Any], auth_headers, prefix: str):
 
 @pytest.fixture
 def signup_email_case(auth_headers):
-    def _f(case: Dict[str, Any]):
-        return _signup_case(case, auth_headers, prefix="emailtest_jasy")
-    return _f
-
-@pytest.fixture
-def signup_password_case(auth_headers):
-    def _f(case: Dict[str, Any]):
-        return _signup_case(case, auth_headers, prefix="pwtest_jasy")
-    return _f
-
-@pytest.fixture
-def signup_full_name_case(auth_headers):
-    def _f(case: Dict[str, Any]):
-        return _signup_case(case, auth_headers, prefix="nametest_jasy")
-    return _f
-
-
-
-
-@pytest.fixture
-def signup_email_case(auth_headers):
-    def _f(case: Dict[str, Any]):
-        return _signup_case(case, auth_headers, prefix="emailtest_jasy")
-    return _f
-
-@pytest.fixture
-def signup_password_case(auth_headers):
-    def _f(case: Dict[str, Any]):
-        return _signup_case(case, auth_headers, prefix="pwtest_jasy")
-    return _f
-
-@pytest.fixture
-def signup_full_name_case(auth_headers):
-    def _f(case: Dict[str, Any]):
-        return _signup_case(case, auth_headers, prefix="nametest_jasy")
-    return _f
-
-
-
-
-@pytest.fixture
-def signup_email_case(auth_headers):
     """Fixture to test email validations (strict expected_status)."""
     def _signup_email(case: Dict[str, Any]):
         return _signup_case(case, auth_headers, prefix="emailtest_jasy")
@@ -140,6 +98,7 @@ def signup_full_name_case(auth_headers):
     def _signup_fullname(case: Dict[str, Any]):
         return _signup_case(case, auth_headers, prefix="nametest_jasy")
     return _signup_fullname
+
 
 
 @pytest.fixture
