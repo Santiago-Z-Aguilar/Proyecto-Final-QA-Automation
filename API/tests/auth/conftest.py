@@ -100,7 +100,6 @@ def signup_full_name_case(auth_headers):
     return _signup_fullname
 
 
-
 @pytest.fixture
 def signup_with_custom_role(auth_headers):
     """
