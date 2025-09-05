@@ -2,7 +2,7 @@
 
 import faker
 
-AIRPORT = "/airports/"
+AIRPORTS = "/airports"
 AUTH_LOGIN = "/auth/login/"
 AUTH_SIGN_UP= "/auth/signup"
 BASE_URL = "https://cf-automation-airline-api.onrender.com"
