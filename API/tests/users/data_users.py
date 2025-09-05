@@ -1,13 +1,39 @@
+# API/utils/data_users.py
+
 from API.utils.data import *
 
-
-invalid_format_messages: {
-    email_with_missing_domain_response: "address must have an @-sign",
-
+# ---------- Payloads válidos ----------
+valid_update_payload = {
+    "email": "updated@example.com",
+    "password": valid_password,
+    "full_name": valid_full_name,
 }
 
+update_role_payload = {
+    "email": "updated@example.com",
+    "password": valid_password,
+    "full_name": valid_full_name,
+    "role": admin_role
+}
 
+# ---------- Payloads inválidos ----------
+invalid_email_payload = {
+    "email": "bad",
+    "password": valid_password,
+    "full_name": valid_full_name,
+}
 
-email_status_code_data = {
-    invalid_email: [422, email_with_missing_domain_response]
+missing_email_payload = {
+    "password": valid_password,
+    "full_name": valid_full_name
+}
+
+missing_password_payload = {
+    "email": "someone@example.com",
+    "full_name": valid_full_name
+}
+
+missing_full_name_payload = {
+    "email": "someone@example.com",
+    "password": valid_password
 }
