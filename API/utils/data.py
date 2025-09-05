@@ -69,6 +69,8 @@ admin_role = "admin"
 invalid_role = "invalid_role"
 
 
+# ========== PAGINATION ==========
+DEFAULT_PAGE_SIZE = 10
 
 # ========== TAIL NUMBERS ==========
 
@@ -130,8 +132,8 @@ aircraft_cases = tail_numbers_to_test + models_to_test + capacities_to_test
 # ========== PAGINATION VALUES ==========
 
 pagination_values_to_test = [
-    {"skip": 0, "limit":10, "expected_status": 200},
-    {"skip": 5, "limit":0, "expected_status": 200},
+    {"skip": 0, "limit":20, "expected_status": 200},
+    {"skip": 5, "limit":20, "expected_status": 200},
     {"skip": "abc", "limit":0, "expected_status": 422},
     {"skip": 0, "limit": "abc", "expected_status": 422},
 ]
@@ -160,6 +162,52 @@ date_time_values_to_test = [
     {"date_time": decimal_seconds_date_time, "expected_status": 201},
     {"date_time": slash_date_time, "expected_status": 422},
     {"date_time": single_digit_day_date_time, "expected_status": 422},
+]
+
+# ========== DATA PARA AIRPORTS =========
+# ========== IATA CODE  ========
+valid_iata_code = "CDG"
+above_limit_iata_code = "CDGZ"
+empty_iata_code = ""
+below_limit_iata_code = "CD"
+lowercase_iata_code = "hnd"
+numeric_iata_code = "190"
+
+iata_code_to_test = [
+    { "iata_code": valid_iata_code, "expected_status": 201},
+    { "iata_code": above_limit_iata_code, "expected_status": 422},
+    { "iata_code": empty_iata_code, "expected_status": 422},
+    { "iata_code": below_limit_iata_code, "expected_status": 422},
+    { "iata_code": lowercase_iata_code, "expected_status": 422},
+    { "iata_code": numeric_iata_code, "expected_status": 422}
+]
+
+# ========== CITY ==========
+
+valid_city = "Paris"
+valid_city_string = "4@r15"
+empty_city = ""
+type_int_city = 0
+
+city_to_test = [
+    {"city": valid_city, "expected_status": 201},
+    {"city": valid_city_string, "expected_status": 422}, #esperado 422, aunque el contrato lo permita (acepta datos inválidos), no es válido para negocio
+    {"city": empty_city, "expected_status": 422}, #esperado 422, aunque el contrato lo permita (es string), pero no es válido para negocio
+    {"city": type_int_city, "expected_status": 422},
+]
+
+# ========== COUNTRY ==========
+
+valid_country = "Francia"
+valid_country_string = "4R@NC14"
+empty_country = ""
+type_int_country = 0
+
+country_to_test = [
+    {"country": valid_country, "expected_status": 201},
+    {"country": valid_country_string, "expected_status": 422},  #esperado 422, aunque el contrato lo permita (acepta datos inválidos), no es válido para negocio
+    {"country": empty_country, "expected_status": 422}, #esperado 422, aunque el contrato lo permita (es string), pero no es válido para negocio
+    {"country": type_int_country, "expected_status": 422},
 ]
 
 

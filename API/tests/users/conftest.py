@@ -1,143 +1,174 @@
 # tests/users/conftest.py
-from API.utils.api_helpers import api_request
-from API.utils.data import valid_password, valid_full_name, admin_role, passenger_role
-from API.utils.user_helpers import _create_user, _build_user_data, delete_user_by_email, get_unique_email, \
-    get_user_by_email
-from API.utils.settings import USERS
-from typing import List, Dict
-import pytest
 import logging
+from uuid import uuid4
+import pytest
+
+from API.utils.api_helpers import api_request
+from API.utils.settings import USERS, USERS_ME
+from API.utils.data import admin_role, passenger_role, valid_password, valid_full_name
+from API.utils.user_helpers import (
+    _create_user,
+    delete_user_by_id,
+    _build_user_data,
+    get_unique_email,
+)
 
 logger = logging.getLogger("Endpoint_USERS")
 
+
+# ------------------------------ POST helpers ------------------------------
 @pytest.fixture
 def create_user_as_admin(auth_headers):
-    """Fixture to create users as administrator with automatic cleanup."""
-    created_users = []
+    """
+    Create users as admin. Yields a callable that returns (status, body).
+    Tracks created user IDs and deletes them after the test.
+    """
+    created_ids = []
 
-    def _create_user_fixture(
-            email: str = None,
-            role: str = admin_role,
-            password: str = valid_password,
-            full_name: str = valid_full_name,
-            **kwargs  # Additional arguments for _create_user
+    def _create(
+        *,
+        email: str | None = None,
+        password: str | None = valid_password,
+        full_name: str | None = valid_full_name,
+        role: str = admin_role,
+        include_email: bool = True,
     ):
-        # Generate unique email if not provided
-        user_email = email or get_unique_email(prefix="admin_user_jasy")
+        if email is None and include_email:
+            email = get_unique_email(prefix="admin_user")
 
-        # Build and send payload
-        payload = _build_user_data(user_email, password, full_name, role)
-        response = _create_user(payload, auth_headers, path=USERS, **kwargs)
+        payload = _build_user_data(
+            email=email if include_email else None,
+            password=password,
+            full_name=full_name,
+            role=role,
+        )
 
-        # Register user for cleanup only if creation was successful (201) or duplicate treated as success
-        if response.status_code in [200, 201]:
-            created_users.append(user_email)
+        resp = _create_user(payload, auth_headers, path=USERS)
+        status = resp.status_code
+        body = resp.json() if getattr(resp, "content", None) else {}
 
-        return response.status_code, response.json()
+        if status in (200, 201) and "id" in body:
+            created_ids.append(body["id"])
 
-    yield _create_user_fixture
+        return status, body
 
-    # Cleanup: delete all successfully created users
-    for email in created_users:
+    yield _create
+
+    for uid in created_ids:
         try:
-            delete_user_by_email(email, auth_headers)
-            logging.info(f"User {email} successfully deleted")
+            delete_user_by_id(uid, auth_headers)
         except Exception as e:
-            logging.warning(f"Failed to delete user {email}: {e}")
+            logger.warning(f"Cleanup exception delete_by_id({uid}): {e}")
 
 
 @pytest.fixture
-def create_user_as_passenger(auth_headers, passenger_headers):
-    """Fixture to create users as passenger with automatic cleanup."""
-    created_users = []
+def create_user_as_passenger(passenger_headers, auth_headers):
+    """
+    Create users as passenger. Yields a callable that returns (status, body).
+    Tracks created user IDs and deletes them after the test (using admin headers).
+    """
+    created_ids = []
 
-    def _create_user_fixture(
-            email: str = None,
-            role: str = passenger_role,
-            password: str = valid_password,
-            full_name: str = valid_full_name,
-            **kwargs  # Additional arguments for _create_user
+    def _create(
+        *,
+        email: str | None = None,
+        password: str = valid_password,
+        full_name: str = valid_full_name,
+        role: str = passenger_role,
     ):
-        # Generate unique email if not provided
-        user_email = email or get_unique_email(prefix="passenger_user_jasy")
+        payload = _build_user_data(
+            email=email,
+            password=password,
+            full_name=full_name,
+            role=role,
+        )
+        resp = _create_user(payload, passenger_headers, path=USERS)
+        status = resp.status_code
+        body = resp.json() if getattr(resp, "content", None) else {}
 
-        # Build and send payload
-        payload = _build_user_data(user_email, password, full_name, role)
-        response = _create_user(payload, passenger_headers, path=USERS, **kwargs)
+        if status in (200, 201) and "id" in body:
+            created_ids.append(body["id"])
 
-        # Register user for cleanup only if creation was successful (201) or duplicate treated as success
-        if response.status_code in [200, 201]:
-            created_users.append(user_email)
+        return status, body
 
-        return response.status_code, response.json()
+    yield _create
 
-    yield _create_user_fixture
-
-    # Cleanup: delete all successfully created users using admin privileges
-    for email in created_users:
+    for uid in created_ids:
         try:
-            delete_user_by_email(email, auth_headers)
-            logging.info(f"User {email} successfully deleted")
+            delete_user_by_id(uid, auth_headers)
         except Exception as e:
-            logging.warning(f"Failed to delete user {email}: {e}")
+            logger.warning(f"Cleanup exception delete_by_id({uid}): {e}")
 
 
-@pytest.fixture()
+@pytest.fixture
 def create_user_without_authentication():
-    """Fixture to create users without_authentication. No cleanup needed."""
-    # Generate unique email if not provided
-    user_email = get_unique_email(prefix="without_authentication_jasy")
+    """
+    Attempt to create a user without headers.
+    Returns a callable that yields (status_code, body).
+    Typically used to assert 401/403/422 responses.
+    """
+    def _create(
+        *,
+        email: str | None = None,
+        password: str = valid_password,
+        full_name: str = valid_full_name,
+        role: str = passenger_role,
+    ):
+        payload = _build_user_data(
+            email=email,
+            password=password,
+            full_name=full_name,
+            role=role,
+        )
+        resp = api_request("post", USERS, json=payload)  # no headers
+        body = resp.json() if getattr(resp, "content", None) else {}
+        return resp.status_code, body
 
-    # Build and send payload
-    payload = _build_user_data(user_email, password=valid_password, full_name=valid_full_name, role=None)
-
-    resp = _create_user(payload, path=USERS)
-    return resp.status_code, resp.json()
-
-
-# ---------- Helpers de tests de get ----------
-@pytest.fixture(scope="session")
-def seed_15_passengers(auth_headers):
-    created = []  # (email, id)
-    try:
-        for _ in range(15):
-            email = get_unique_email(prefix="bulk_passenger")
-            payload = _build_user_data(email, valid_password, valid_full_name, passenger_role)
-            resp = _create_user(payload, auth_headers, path=USERS, treat_duplicate_as_success=True)
-
-            if resp is None:
-                raise RuntimeError("api_request devolvió None al crear usuario")
-
-            if resp.status_code in (200, 201):
-                data = resp.json()
-            elif resp.status_code == 400 and "already registered" in resp.text.lower():
-                # Con el fix de get_user_by_email paginado, _create_user normalmente devolverá 201 sintético.
-                # Si aún llega 400 aquí, forzamos la búsqueda y continuamos.
-                user = get_user_by_email(email, auth_headers)
-                if not user:
-                    raise AssertionError(f"Duplicado reportado pero no encontrado en listado para {email}")
-                data = {"id": user["id"], "email": email}
-            else:
-                raise AssertionError(f"Error creando usuario: {resp.status_code} {getattr(resp, 'text','')}")
-
-            uid = data.get("id")
-            if not uid:
-                # Fallback extra por si la respuesta no trae id
-                user = get_user_by_email(email, auth_headers)
-                if not user or not user.get("id"):
-                    raise AssertionError(f"No se pudo obtener id para {email}")
-                uid = user["id"]
-
-            created.append((email, uid))
-
-        # Si llegamos aquí, ya hay 15 creados
-        yield [email for (email, _) in created]
-
-    finally:
-        # Cleanup SIEMPRE corre, aunque falle arriba
-        for email, uid in created:
-            resp = api_request("DELETE", f"{USERS.rstrip('/')}/{uid}", headers=auth_headers)
-            ok = bool(resp and resp.status_code in (200, 202, 204))
-            logger.info(f"Cleanup {'✅' if ok else '❌'} {email} ({uid}) -> {resp and resp.status_code}")
+    return _create
 
 
+# ------------------------------ GET helpers ------------------------------
+@pytest.fixture
+def users_get():
+    """Return a callable to GET /users with optional headers and params."""
+    def _call(headers=None, params=None):
+        return api_request("get", USERS, headers=headers, params=params)
+    return _call
+
+
+@pytest.fixture
+def me_get():
+    """Return a callable to GET /users/me with optional headers."""
+    def _call(headers=None):
+        return api_request("get", USERS_ME, headers=headers)
+    return _call
+
+
+# ------------------------------ PUT / DELETE helpers ------------------------------
+@pytest.fixture
+def update(auth_headers):
+    """Return a callable to PUT /users/{id} with a payload and explicit headers."""
+    def _do(uid, payload, headers):
+        return api_request("put", f"{USERS}{uid}", json=payload, headers=headers)
+    return _do
+
+
+@pytest.fixture
+def fake_user_id():
+    """Return a synthetically generated user-like ID for negative tests."""
+    return f"usr_fake-{uuid4().hex[:8]}"
+
+
+# ------------------------------ Seeds for pagination tests ------------------------------
+@pytest.fixture
+def seed_15_passengers(create_user_as_admin):
+    """
+    Create 15 passenger users for pagination tests.
+    Cleanup is handled by create_user_as_admin (IDs are tracked and deleted).
+    """
+    created = []
+    for _ in range(15):
+        sc, body = create_user_as_admin(role=passenger_role)
+        if sc in (200, 201):
+            created.append(body["id"])
+    yield created
