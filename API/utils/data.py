@@ -69,6 +69,10 @@ admin_role = "admin"
 invalid_role = "invalid_role"
 
 
+# ========== PAGINATION ==========
+DEFAULT_PAGE_SIZE = 10
+=======
+
 
 # ========== TAIL NUMBERS ==========
 
@@ -161,5 +165,3 @@ date_time_values_to_test = [
     {"date_time": slash_date_time, "expected_status": 422},
     {"date_time": single_digit_day_date_time, "expected_status": 422},
 ]
-
-

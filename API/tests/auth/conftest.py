@@ -4,33 +4,25 @@ import logging
 from typing import Any, Dict, Optional, Tuple
 import pytest
 
-from API.utils.data import valid_password, valid_full_name, valid_email
+from API.utils.data import valid_password, valid_full_name
 from API.utils.api_helpers import api_request
 from API.utils.settings import AUTH_LOGIN, AUTH_SIGN_UP
 from API.utils.user_helpers import (
     get_unique_email,
     get_user_by_email,
-    delete_user_by_email,
+    delete_user_by_id,
     user_exist_skip,
     _create_user,
-    _build_user_data
+    _build_user_data,
+    _extract_user_id_from_response,
 )
 
-# ---------- Logging ----------
-# NOTE: pytest already manages logging. Avoid basicConfig unless you need custom setup.
-# logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("qa_tests")
 
 
-# ---------- Helpers ----------
-
 def _assert_created_user_status(resp, expected_status: int, context: Dict[str, Any]) -> None:
-    """
-    Asserts the expected status code and logs a clear error message on failure.
-    This guarantees we get a log line whenever the assertion fails.
-    """
+    """Assert response status equals expected_status, with helpful logs on mismatch."""
     assert resp is not None, "API response is None"
-
     if resp.status_code != expected_status:
         logger.error(
             "Signup status mismatch | expected=%s actual=%s | context=%s | response_text=%s",
@@ -42,146 +34,151 @@ def _assert_created_user_status(resp, expected_status: int, context: Dict[str, A
         f"Response: {getattr(resp, 'text', '<no text>')}\n---"
     )
 
-
-def _signup_case(case: Dict[str, Any], auth_headers, prefix: str) -> Tuple[Any, str, Optional[Dict[str, Any]]]:
+def _signup_case(case: Dict[str, Any], auth_headers, prefix: str):
     """
-    Common signup flow for field validation tests.
-    - Skips if expecting 201 and user already exists.
-    - Calls _create_user with duplicate-as-success only for expected 201.
-    - Performs hybrid cleanup if a user exists after the call.
+    Run signup and return (response, expected_status, user_or_none).
     """
     email = case.get("email", get_unique_email(prefix=prefix))
     password = case.get("password", valid_password)
     full_name = case.get("full_name", valid_full_name)
     expected_status = case["expected_status"]
 
-    # if expected_status == 201:
-    #     user_exist_skip(email, auth_headers)
+    try:
+        existing = get_user_by_email(email, auth_headers)
+        if existing and existing.get("id"):
+            delete_user_by_id(existing["id"], auth_headers)
+    except Exception:
+        pass
 
     payload = _build_user_data(email, password, full_name)
-
-    resp = None
+    created_id = None
     user = None
+
     try:
         resp = _create_user(
             payload,
             auth_headers,
             path=AUTH_SIGN_UP,
-            treat_duplicate_as_success=(expected_status == 201)
+            treat_duplicate_as_success=(expected_status == 201),
         )
-        _assert_created_user_status(resp, expected_status, case)
-
         if resp.status_code == 201:
-            user = get_user_by_email(email, auth_headers)
-
-        return resp, email, user
-
-    except Exception:
-        # This ensures 500s (or any unexpected exception) are also logged with full traceback.
-        logger.exception(
-            "Unexpected exception during signup | email=%s | expected_status=%s | case=%s",
-            email, expected_status, case
-        )
-        raise
-
+            created_id = _extract_user_id_from_response(resp)
+            user = get_user_by_email(email, auth_headers) or {}
+        return resp, expected_status, user
     finally:
         try:
-            exist = user or get_user_by_email(email, auth_headers)
-            if exist:
-                deleted = delete_user_by_email(email, auth_headers)
-                logger.info("Cleanup: %s User '%s' deleted", "✅" if deleted else "❌", email)
-        except Exception as e:
-            logger.warning("Cleanup exception for '%s': %s", email, e)
+            if created_id:
+                delete_user_by_id(created_id, auth_headers)
+            else:
+                found = get_user_by_email(email, auth_headers)
+                if found and found.get("id"):
+                    delete_user_by_id(found["id"], auth_headers)
+        except Exception:
+            pass
 
-
-
-
-
-# ---------- Fixtures by field ----------
 @pytest.fixture
 def signup_email_case(auth_headers):
-    """Fixture to test email validations."""
+    """Fixture to test email validations (strict expected_status)."""
     def _signup_email(case: Dict[str, Any]):
         return _signup_case(case, auth_headers, prefix="emailtest_jasy")
     return _signup_email
 
+
 @pytest.fixture
 def signup_password_case(auth_headers):
-    """Fixture to test password validations."""
+    """Fixture to test password validations (strict expected_status)."""
     def _signup_password(case: Dict[str, Any]):
         return _signup_case(case, auth_headers, prefix="pwtest_jasy")
     return _signup_password
 
+
 @pytest.fixture
 def signup_full_name_case(auth_headers):
-    """Fixture to test full_name validations."""
+    """Fixture to test full_name validations (strict expected_status)."""
     def _signup_fullname(case: Dict[str, Any]):
         return _signup_case(case, auth_headers, prefix="nametest_jasy")
     return _signup_fullname
 
 
-# ---------- Other fixtures ----------
 @pytest.fixture
 def signup_with_custom_role(auth_headers):
-    """Fixture to create users with custom role (always expects success)."""
+    """
+    Create a user with a custom role (expects success).
+    Returns the created user object; cleanup by ID is guaranteed.
+    """
     def _signup(role: str, prefix: str = "role_test_jasy"):
         test_email = get_unique_email(prefix="custom_role_jasy")
         data = _build_user_data(test_email, valid_password, valid_full_name, role=role)
 
-        resp = None
+        created_id: Optional[str] = None
         try:
             resp = _create_user(data, auth_headers, path=AUTH_SIGN_UP, treat_duplicate_as_success=True)
-            return get_user_by_email(test_email, auth_headers)
+            created_id = _extract_user_id_from_response(resp)
+            user = get_user_by_email(test_email, auth_headers) or {}
+            return user
         finally:
             try:
-                exist = get_user_by_email(test_email, auth_headers) is not None
-                if exist:
-                    deleted = delete_user_by_email(test_email, auth_headers)
-                    logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{test_email}' deleted")
+                if created_id:
+                    delete_user_by_id(created_id, auth_headers)
+                else:
+                    found = get_user_by_email(test_email, auth_headers)
+                    if found and found.get("id"):
+                        delete_user_by_id(found["id"], auth_headers)
             except Exception as e:
-                logger.warning(f"Cleanup exception for '{test_email}': {e}")
+                logger.warning("Cleanup exception for '%s': %s", test_email, e)
     return _signup
+
 
 @pytest.fixture
 def signup_with_valid_data(auth_headers):
-    """Fixture to create a valid user and yield its object, with auto cleanup."""
+    """
+    Create a valid user and yield its object.
+    Ensures cleanup by ID; falls back to email lookup if needed.
+    """
     unique_email = get_unique_email(prefix="valid_user_jasy")
     data = _build_user_data(unique_email, valid_password, valid_full_name)
 
     user_exist_skip(unique_email, auth_headers)
-    resp = None
+    created_id: Optional[str] = None
     try:
         resp = _create_user(data, auth_headers, path=AUTH_SIGN_UP, treat_duplicate_as_success=True)
-        user = get_user_by_email(unique_email, auth_headers)
+        created_id = _extract_user_id_from_response(resp)
+        user = get_user_by_email(unique_email, auth_headers) or {}
         yield user
     finally:
         try:
-            exists = get_user_by_email(unique_email, auth_headers) is not None
-            if exists:
-                deleted = delete_user_by_email(unique_email, auth_headers)
-                logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{unique_email}' deleted")
+            if created_id:
+                delete_user_by_id(created_id, auth_headers)
+            else:
+                found = get_user_by_email(unique_email, auth_headers)
+                if found and found.get("id"):
+                    delete_user_by_id(found["id"], auth_headers)
         except Exception as e:
-            logger.warning(f"Cleanup exception for '{unique_email}': {e}")
+            logger.warning("Cleanup exception for '%s': %s", unique_email, e)
 
 
-# ---------- Authentication helpers ----------
 def login(user: str, password: str):
-    """Performs login and returns the raw response. Only 200 and 401 are expected."""
+    """Perform login and return the raw response. Only 200 and 401 are expected."""
     response = api_request("post", AUTH_LOGIN, data={"username": user, "password": password})
     if response is None:
         raise Exception("Login failed after retries")
     if response.status_code not in (200, 401):
-        raise Exception(f"Unexpected status: {response.status_code}, Response: {response.text}")
+        raise Exception(f"Unexpected status: {response.status_code}. Response: {response.text}")
     return response
 
+
 def login_as_passenger(auth_headers):
-    """Creates a passenger user and logs in. Ensures role is 'passenger'."""
+    """
+    Create a passenger user, assert role from read, then perform login.
+    Ensures cleanup by ID; falls back to email lookup if needed.
+    """
     unique_email = get_unique_email(prefix="passenger_test_jasy")
     data = _build_user_data(unique_email, valid_password, valid_full_name)
 
-    resp = None
+    created_id: Optional[str] = None
     try:
         resp = _create_user(data, auth_headers, path=AUTH_SIGN_UP, treat_duplicate_as_success=True)
+        created_id = _extract_user_id_from_response(resp)
 
         user = get_user_by_email(unique_email, auth_headers)
         assert user and user.get("role") == "passenger"
@@ -189,9 +186,11 @@ def login_as_passenger(auth_headers):
         return login(unique_email, valid_password)
     finally:
         try:
-            exist = get_user_by_email(unique_email, auth_headers) is not None
-            if exist:
-                deleted = delete_user_by_email(unique_email, auth_headers)
-                logger.info(f"Cleanup: {'✅' if deleted else '❌'} User '{unique_email}' deleted")
+            if created_id:
+                delete_user_by_id(created_id, auth_headers)
+            else:
+                found = get_user_by_email(unique_email, auth_headers)
+                if found and found.get("id"):
+                    delete_user_by_id(found["id"], auth_headers)
         except Exception as e:
-            logger.warning(f"Cleanup exception for '{unique_email}': {e}")
+            logger.warning("Cleanup exception for '%s': %s", unique_email, e)
