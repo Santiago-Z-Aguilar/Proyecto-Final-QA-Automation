@@ -3,6 +3,7 @@
 import faker
 
 AIRPORT = "/airports/"
+FLIGHTS = "/flights/"
 AUTH_LOGIN = "/auth/login/"
 AUTH_SIGN_UP= "/auth/signup"
 BASE_URL = "https://cf-automation-airline-api.onrender.com"
@@ -48,4 +49,21 @@ aircraft_schema = {
         "capacity": {"type": "integer"},
         "id": {"type": "string"},
     }
+}
+
+flight_schema = {
+    "type": "object",
+    "required": ["origin","destination","departure_time","arrival_time",
+                 "base_price","aircraft_id","string","available_seats"],
+    "properties": {
+        "origin": {"type": "string", "minLength": 3, "maxLength": 3},
+        "destination": {"type": "string", "minLength": 3, "maxLength": 3},
+        "departure_time": { "type": "string", "format": "date-time" },
+        "arrival_time": { "type": "string", "format": "date-time" },
+        "base_price":  {"type": "integer"},
+        "aircraft_id": {"type": "string"},
+        "id": {"type": "string"},
+        "available_seats": {"type": "integer"}
+    },
+    "additionalProperties": True
 }
