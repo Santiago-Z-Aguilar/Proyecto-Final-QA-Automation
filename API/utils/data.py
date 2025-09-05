@@ -68,5 +68,100 @@ passenger_role = "passenger"
 admin_role = "admin"
 invalid_role = "invalid_role"
 
+
 # ========== PAGINATION ==========
 DEFAULT_PAGE_SIZE = 10
+=======
+
+
+# ========== TAIL NUMBERS ==========
+
+valid_tail_number = "PY-7162A"
+min_valid_tail_number = "AR-524"
+empty_tail_number = ""
+tail_number_with_accents = "ÁR-524"
+tail_number_with_apostrophe = "A'R-524"
+tail_number_with_space = "AR 524"
+below_max_tail_number = "AR-524ARA"
+max_tail_number = "AR-524ARAR"
+above_max_tail_number = "AR-524ARARA"
+symbols_only_tail_number = "@#$%^&*"
+unicode_tail_number = "李雷-李雷李雷"
+spaces_only_tail_number = "   "
+
+tail_numbers_to_test = [
+    {"tail_number": valid_tail_number, "expected_status": 201},
+    {"tail_number": min_valid_tail_number, "expected_status": 201},
+    {"tail_number": empty_tail_number, "expected_status": 422},
+    {"tail_number": tail_number_with_accents, "expected_status": 422},
+    {"tail_number": tail_number_with_apostrophe, "expected_status": 422},
+    {"tail_number": tail_number_with_space, "expected_status": 201},
+    {"tail_number": below_max_tail_number, "expected_status": 201},
+    {"tail_number": max_tail_number, "expected_status": 201},
+    {"tail_number": above_max_tail_number, "expected_status": 422},
+    {"tail_number": symbols_only_tail_number, "expected_status": 422},
+    {"tail_number": unicode_tail_number, "expected_status": 422},
+    {"tail_number": spaces_only_tail_number, "expected_status": 422},
+]
+
+# ========== CAPACITIES ==========
+
+valid_capacity = 200
+negative_capacity = -200
+zero_capacity = 0
+wrong_capacity_type = "abc"
+
+capacities_to_test = [
+    {"capacity": valid_capacity, "expected_status": 201},
+    {"capacity": negative_capacity, "expected_status": 422},
+    {"capacity": zero_capacity, "expected_status": 422},
+    {"capacity": wrong_capacity_type, "expected_status": 422},
+]
+
+# ========== MODELS ==========
+
+valid_model = "Airbus A320-200"
+empty_model = ""
+
+models_to_test = [
+    {"model": valid_model, "expected_status": 201},
+    {"model": empty_model, "expected_status": 422},
+]
+
+aircraft_cases = tail_numbers_to_test + models_to_test + capacities_to_test
+
+
+# ========== PAGINATION VALUES ==========
+
+pagination_values_to_test = [
+    {"skip": 0, "limit":10, "expected_status": 200},
+    {"skip": 5, "limit":0, "expected_status": 200},
+    {"skip": "abc", "limit":0, "expected_status": 422},
+    {"skip": 0, "limit": "abc", "expected_status": 422},
+]
+
+# ========== DATE-TIME ==========
+
+valid_date_time = "2025-09-02T18:10:15"
+no_t_separator_date_time = "2025-09-0218:10:15"
+space_separator_date_time = "2025-09-02 18:10:15"
+lower_t_separator_date_time = "2025-09-02t18:10:15"
+Z_timezone_date_time = "2025-09-02T18:10:15Z"
+A_timezone_date_time = "2025-09-02T18:10:15A"
+offset_timezone_date_time = "2025-09-02T18:10:15+2:00"
+decimal_seconds_date_time = "2025-09-02T18:10:15.225"
+slash_date_time = "2025/09/02T18:10:15"
+single_digit_day_date_time = "2025-09-2T18:10:15"
+
+date_time_values_to_test = [
+    {"date_time": valid_date_time, "expected_status": 201},
+    {"date_time": no_t_separator_date_time, "expected_status": 422},
+    {"date_time": space_separator_date_time, "expected_status": 201},
+    {"date_time": lower_t_separator_date_time, "expected_status": 201},
+    {"date_time": Z_timezone_date_time, "expected_status": 201},
+    {"date_time": A_timezone_date_time, "expected_status": 422},
+    {"date_time": offset_timezone_date_time, "expected_status": 201},
+    {"date_time": decimal_seconds_date_time, "expected_status": 201},
+    {"date_time": slash_date_time, "expected_status": 422},
+    {"date_time": single_digit_day_date_time, "expected_status": 422},
+]
