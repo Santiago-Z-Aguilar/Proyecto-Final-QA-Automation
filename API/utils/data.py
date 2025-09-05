@@ -71,8 +71,6 @@ invalid_role = "invalid_role"
 
 # ========== PAGINATION ==========
 DEFAULT_PAGE_SIZE = 10
-=======
-
 
 # ========== TAIL NUMBERS ==========
 
