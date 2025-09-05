@@ -2,14 +2,13 @@
 
 import faker
 
-AIRPORT = "/airports/"
-FLIGHTS = "/flights/"
+AIRPORTS = "/airports"
+FLIGHTS = "/flights"
 AUTH_LOGIN = "/auth/login/"
 AUTH_SIGN_UP= "/auth/signup"
 BASE_URL = "https://cf-automation-airline-api.onrender.com"
 USERS = "/users/"
 AIRCRAFTS = "/aircrafts"
-FLIGHTS = "/flights"
 BOOKINGS = "/bookings"
 
 MAX_WAIT_SECONDS = 60

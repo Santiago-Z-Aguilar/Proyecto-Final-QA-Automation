@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Proyecto-Final-QA.iml" filepath="$PROJECT_DIR$/.idea/Proyecto-Final-QA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FinalQA.iml" filepath="$PROJECT_DIR$/.idea/FinalQA.iml" />
     </modules>
   </component>
 </project>
