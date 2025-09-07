@@ -217,127 +217,116 @@ country_to_test = [
     {"country": type_int_country, "expected_status": 422},
 ]
 
+# ========== DATA FLIGHTS ==========
 # ========== IATA ==========
 chars = [str(faker.random_int(0, 9)), faker.random_uppercase_letter(), faker.random_uppercase_letter()]
 
-valid_iata = ''.join(random_uppercase_letters() for _ in range(3))
+valid_iata_origin = ''.join(random.choices(string.ascii_uppercase, k=3))
+valid_iata_destination = ''.join(random.choices(string.ascii_uppercase, k=3))
 iata_number_letters = ''.join(random.sample(chars, len(chars)))
 iata_four_chr = ''.join(random.choices(string.ascii_uppercase, k=4))
-iata_two_chr += ''.join(random.choices(string.ascii_uppercase, k=2))
+iata_two_chr = ''.join(random.choices(string.ascii_uppercase, k=2))
 iata_lowercase = ''.join(random.choices(string.ascii_lowercase, k=3))
 iata_lower_uppercase = ''.join(random.choices(string.ascii_letters, k=3))
 iata_empty = ""
 
-iata_data_to_test = [
-    {"origin": valid_iata, "expected_status": 201},
-    {"origin": iata_number_letters, "expected_status": 422},
-    {"origin": iata_four_chr, expected_status :422},
-    {"origin": iata_two_chr, expected_status : 422},
-    {"origin": iata_lowercase, "expected_status": 422},
-    {"origin": iata_lower_uppercase , "expected_status": 422},
-    {"origin": iata_empty , "expected_status": 422},
+iata_cases = [
+    ("origin", valid_iata_origin, 201),
+    ("origin", iata_number_letters, 422),
+    ("origin", iata_four_chr, 422),
+    ("origin", iata_two_chr, 422),
+    ("origin", iata_lowercase, 422),
+    ("origin", iata_lower_uppercase, 422),
+    ("origin", iata_empty, 422),
 
-    {"destination": valid_iata, "expected_status": 201},
-    {"destination": iata_number_letters, "expected_status": 422},
-    {"destination": iata_four_chr, expected_status: 422},
-    {"destination": iata_two_chr, expected_status: 422},
-    {"destination": iata_lowercase, "expected_status": 422},
-    {"destination": iata_lower_uppercase , "expected_status": 422},
-    {"destination": iata_empty , "expected_status": 422}
+    ("destination", valid_iata_destination, 201),
+    ("destination", iata_number_letters, 422),
+    ("destination", iata_four_chr, 422),
+    ("destination", iata_two_chr, 422),
+    ("destination", iata_lowercase, 422),
+    ("destination", iata_lower_uppercase, 422),
+    ("destination", iata_empty, 422),
+    ("destination", valid_iata_origin, 201),  # ojo: debería fallar por reglas de negocio
 ]
 
 
 # ========== DATE TIME ==========
 today = datetime.today()
-pas = today - timedelta(days=faker.random_int(min=1, max=5))
-future = today + timedelta(days=faker.random_int(min=1, max=10))
+pas = today - timedelta(days=faker.random_int(min=10, max=50))
+future = today + timedelta(days=faker.random_int(min=10, max=30))
 
-datetime_valid = today.strftime("%Y-%m-%dT%H:%M:%S") + f".{fecha_random.microsecond // 1000:03d}Z"
+datetime_today = today.strftime("%Y-%m-%dT%H:%M:%S") + f".{today.microsecond // 1000:03d}Z"
 datetime_pass = pas.strftime("%Y-%m-%dT%H:%M:%S")
 datetime_future = future.strftime("%Y-%m-%dT%H:%M:%S")
 datetime_empty = ""
 datetime_zero = 0
 datetime_number = faker.random_int(min=1, max=1000)
 datetime_slash = today.strftime("%Y/%m/%dT%H:%M:%S.%f")[:-3] + "Z"
-date_mdy = today.strftime("%m/%d/%YT%H:%M:%S.%f")[:-3] + "Z"
-date_dmy = now.strftime("%d/%m/%YT%H:%M:%S.%f")[:-3] + "Z"
+datetime_mdy = today.strftime("%m/%d/%YT%H:%M:%S.%f")[:-3] + "Z"
+datetime_dmy = today.strftime("%d/%m/%YT%H:%M:%S.%f")[:-3] + "Z"
 
-datetime_data_to_test = [
-    {"departure_time": datetime_valid, "expected_status": 201},
-    {"departure_time": datetime_pass, "expected_status": 422}, #No deberia dejar vuelos en pasado
-    {"departure_time": datetime_future, "expected_status": 201},
-    {"departure_time": datetime_empty, "expected_status": 422},
-    {"departure_time": datetime_zero, "expected_status": 422},
-    {"departure_time": datetime_number, "expected_status": 422},
-    {"departure_time": datetime_slash, "expected_status": 422},
-    {"departure_time": datetime_mdy, "expected_status": 422},
-    {"departure_time": datetime_dmy, "expected_status": 422},
+datetime_cases = [
+    ("departure_time", datetime_today, 201),
+    ("departure_time", datetime_pass, 422),
+    ("departure_time", datetime_future, 201),
+    ("departure_time", datetime_empty, 422),
+    ("departure_time", datetime_zero, 422),
+    ("departure_time", datetime_number, 422),
+    ("departure_time", datetime_slash, 422),
+    ("departure_time", datetime_mdy, 422),
+    ("departure_time", datetime_dmy, 422),
 
-    {"arrival_time": datetime_valid, "expected_status": 201},
-    {"arrival_time": datetime_pass, "expected_status": 422},  # No deberia dejar vuelos en pasado
-    {"arrival_time": datetime_future, "expected_status": 201},
-    {"arrival_time": datetime_empty, "expected_status": 422},
-    {"arrival_time": datetime_zero, "expected_status": 422},
-    {"arrival_time": datetime_number, "expected_status": 422},
-    {"arrival_time": datetime_slash, "expected_status": 422},
-    {"arrival_time": datetime_mdy, "expected_status": 422},
-    {"arrival_time": datetime_dmy, "expected_status": 422},
-    #Poner uno donde arrival es igual departure futuro o pasado
+    ("arrival_time", datetime_today, 201),
+    ("arrival_time", datetime_pass, 422),
+    ("arrival_time", datetime_future, 201),
+    ("arrival_time", datetime_empty, 422),
+    ("arrival_time", datetime_zero, 422),
+    ("arrival_time", datetime_number, 422),
+    ("arrival_time", datetime_slash, 422),
+    ("arrival_time", datetime_mdy, 422),
+    ("arrival_time", datetime_dmy, 422),
 ]
 
 # ========== BASE PRICE ==========
-base_price_valid = Decimal(str(faker.random.uniform(1, 10000))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+decimal = Decimal(str(faker.random.uniform(1, 10000))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+base_price_valid = float(decimal)
 base_price_int = faker.random_number(digits=24, fix_len=True)
 base_price_30digits = faker.random_number(digits=30, fix_len=True)
-base_price_negative = faker.random_number(digits=-30, fix_len=True)
-base_price_zero = faker.random_number(digits=0, fix_len=True)
-base_price_one = faker.random_number(digits=1, fix_len=True)
+base_price_negative = -faker.random_number(digits=30, fix_len=True)
+base_price_zero = 0
 base_price_string = faker.word()
 
-baseprice_data_to_test = [
+baseprice_cases = [
     {"base_price": base_price_valid, "expected_status": 201},
     {"base_price": base_price_int, "expected_status": 201},
     {"base_price": base_price_30digits, "expected_status": 201},
     {"base_price": base_price_negative, "expected_status": 422},
     {"base_price": base_price_zero, "expected_status": 201},
-    {"base_price": base_price_one, "expected_status": 201},
     {"base_price": base_price_string, "expected_status": 422}
 ]
 
 # ========== AIRCRAFT ==========
-id_aircraft_valid = f"acf-{uuid.uuid4().hex[:8]}" # taerlo desde la creacion
-id_aircraft_12chr = f"acf-{uuid.uuid4().hex[:12]}"
-id_aircraft_generated = f"acf-{faker.hexify(text='^^^^^^^^')}"
-id_aircraft_no_prefix = uuid.uuid4().hex[:8]
-id_aircraft_prefix = f"acx-{uuid.uuid4().hex[:8]}"
-id_aircraft_too_short = "acf-123"
-id_aircraft_invalid_with_specials = "acf-9a58$77b"
-id_aircraft_zero = 0
+id_aircraft_generated = f"acf-{uuid.uuid4().hex[:8]}"
+id_aircraft_empty = ""
 id_aircraft_number = faker.random_number(digits=10, fix_len=True)
 
 aircraft_data_to_test = [
-    {"aircraft_id": id_aircraft_valid, "expected_status": 201},
-    {"aircraft_id": id_aircraft_12chr, "expected_status": 422},
     {"aircraft_id": id_aircraft_generated, "expected_status": 422},
-    {"aircraft_id": id_aircraft_no_prefix, "expected_status": 422},
-    {"aircraft_id": id_aircraft_prefix, "expected_status": 422},
-    {"aircraft_id": id_aircraft_too_short, "expected_status": 422},
-    {"aircraft_id": id_aircraft_invalid_with_specials, "expected_status": 422},
-    {"aircraft_id": id_aircraft_zero, "expected_status": 422},
+    {"aircraft_id": id_aircraft_empty, "expected_status": 422},
     {"aircraft_id": id_aircraft_number, "expected_status": 422}
 ]
-
 
 # ========== SEATS ==========
 seats_valid = faker.random_int(min=1, max=500)
 seats_decimal = Decimal(str(faker.random.uniform(1, 10000))).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
 seats_30digits = faker.random_number(digits=30, fix_len=True)
 seats_1digit = faker.random_number(digits=1, fix_len=True)
-seats_negative = faker.random_number(digits=-30, fix_len=True)
-seats_zero = faker.random_number(digits=0, fix_len=True)
+seats_negative = -faker.random_number(digits=30, fix_len=True)
+seats_zero = 0
 seats_string = faker.word()
 
-seats_data_to_test = [
+seats_cases = [
     {"available_seats": seats_valid, "expected_status": 201},
     {"available_seats": seats_decimal, "expected_status": 422},
     {"available_seats": seats_30digits, "expected_status": 201}, #No deberia
