@@ -1,21 +1,18 @@
-import json
-
-from API.utils.api_helpers import api_request
-from API.utils.flights_helpers import create_valid_flight
-import pytest
 from API.utils.settings import BOOKINGS
+from API.utils.flights_helpers import create_valid_flight
+from API.utils.api_helpers import api_request
+from API.utils.data import valid_full_name
 
-@pytest.fixture
-def create_booking(auth_headers):
+def create_valid_booking(auth_headers):
 
     flight = create_valid_flight(auth_headers)
     booking = {
-     "flight_id": flight["id"],
+    "flight_id": flight["id"],
     "passengers": [
         {
-        "full_name": "string",
+        "full_name": valid_full_name,
         "passport": "string",
         "seat": "12"
         }]}
     response = api_request(method="POST",path=BOOKINGS,headers=auth_headers,data=booking)
-    return response
+    return response.json

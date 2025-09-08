@@ -210,4 +210,26 @@ country_to_test = [
     {"country": type_int_country, "expected_status": 422},
 ]
 
+# ========== PASSENGERS ==========
+valid_passenger = {"full_name": valid_full_name,"passport": "string","seat": "12A"}
+null_seat_passenger = {"full_name": valid_full_name,"passport": "string","seat": None}
+missing_full_name_passenger = {"passport": "string","seat": "12A"}
+missing_passport_passenger = {"full_name": valid_full_name,"seat": "12A"}
+
+one_passenger_payload = [valid_passenger]
+two_passengers_payload = [valid_passenger,valid_passenger]
+null_seat_payload = [null_seat_passenger]
+no_passengers_payload = []
+missing_full_name_payload = [missing_full_name_passenger]
+missing_passport_payload = [missing_full_name_passenger]
+
+passengers_to_test = [
+    {"passengers": one_passenger_payload, "expected_status": 201},
+    {"passengers": two_passengers_payload, "expected_status": 201},
+    {"passengers": null_seat_payload, "expected_status": 201},
+    {"passengers": no_passengers_payload, "expected_status": 422},
+    {"passengers": missing_full_name_payload, "expected_status": 422},
+    {"passengers": missing_passport_payload, "expected_status": 422}
+]
+
 
