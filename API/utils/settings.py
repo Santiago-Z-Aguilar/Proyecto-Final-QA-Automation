@@ -6,7 +6,7 @@ AIRPORTS = "/airports"
 FLIGHTS = "/flights"
 AUTH_LOGIN = "/auth/login/"
 AUTH_SIGN_UP= "/auth/signup"
-BASE_URL = "https://cf-automation-airline-api.onrender.com"
+BASE_URL = "http://127.0.0.1:8000"
 USERS = "/users/"
 AIRCRAFTS = "/aircrafts"
 BOOKINGS = "/bookings"
@@ -65,4 +65,27 @@ flight_schema = {
         "available_seats": {"type": "integer"}
     },
     "additionalProperties": True
+}
+
+booking_schema = {
+    "type": "object",
+    "required": ["id", "flight_id", "user_id","status","passengers"],
+    "properties": {
+        "id": {"type": "string"},
+        "flight_id": {"type": "string"},
+        "user_id": {"type": "string"},
+        "status": {"type": "string", "enum":["draft","paid","checked_in","cancelled"]},
+        "passengers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["full_name","passport"],
+                "properties": {
+                    "full_name": {"type": "string"},
+                    "passport": {"type": "string"},
+                    "seat": {"type": ["string", "null"]},
+                }
+            }
+        }
+    }
 }

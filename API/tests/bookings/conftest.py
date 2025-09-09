@@ -56,7 +56,12 @@ def update_booking():
         return response
     return _update_booking
 
-
+@pytest.fixture
+def delete_booking():
+    def _delete_booking(booking_id,headers):
+        response = api_request(method="DELETE", path=f"{BOOKINGS}/{booking_id}",headers=headers)
+        return response
+    return _delete_booking
 
 @pytest.fixture
 def create_valid_booking_as_passenger(passenger_headers,auth_headers):

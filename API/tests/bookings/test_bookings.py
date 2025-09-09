@@ -1,7 +1,8 @@
 import pytest
 from API.utils.bookings_helpers import create_valid_booking
 from API.utils.data import passengers_to_test,flights_to_test,pagination_values_to_test,two_passengers_payload
-
+from jsonschema import validate
+from API.utils.settings import booking_schema
 
 class TestBookings:
     # POST
@@ -36,10 +37,15 @@ class TestBookings:
         response = get_booking(booking_id,None)
         assert response.status_code == 401
 
-    def test_get_booking_admin(self,get_booking,auth_headers):
-        booking_id = create_valid_booking(auth_headers)["id"]
+    def test_get_booking_admin(self,get_booking,auth_headers,create_valid_booking_as_passenger):
+        booking_id = create_valid_booking_as_passenger["id"]
         response = get_booking(booking_id,auth_headers)
         assert response.status_code == 200
+
+    def test_get_invalid_token(self,get_booking,auth_headers):
+        booking_id = "lpb-235asd68"
+        response = get_booking(booking_id,auth_headers)
+        assert response.status_code == 404
 
     # PATCH
     @pytest.mark.parametrize("update_case",[
@@ -54,13 +60,34 @@ class TestBookings:
         booking_id = create_valid_booking(auth_headers)["id"]
         response = update_booking(booking_id,update_case["case"],auth_headers)
         assert response.status_code == update_case["expected_status"]
+
     # DELETE
+    def test_delete_own_booking_passenger(self,passenger_headers,delete_booking,create_valid_booking_as_passenger):
+        booking_id = create_valid_booking_as_passenger["id"]
+        response = delete_booking(booking_id,passenger_headers)
+        assert response.status_code == 204
+
+    def test_delete_other_user_booking(self,delete_booking,auth_headers,passenger_headers):
+        booking_id = create_valid_booking(auth_headers)["id"]
+        response = delete_booking(booking_id,passenger_headers)
+        assert response.status_code == 403
+
+    def test_delete_booking_without_token(self,delete_booking,auth_headers):
+        booking_id = create_valid_booking(auth_headers)["id"]
+        response = delete_booking(booking_id,None)
+        assert response.status_code == 401
+
+    def test_delete_invalid_token(self,delete_booking,auth_headers):
+        booking_id = "lpb-235asd68"
+        response = delete_booking(booking_id,auth_headers)
+        assert response.status_code == 404
 
 
+    #Schema test
 
-
-
-
-
+    def test_aircraft_schema(self,auth_headers,get_booking):
+        booking_id = create_valid_booking(auth_headers)["id"]
+        response = get_booking(booking_id,auth_headers)
+        validate(instance=response.json(), schema=booking_schema)
 
 
