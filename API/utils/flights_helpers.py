@@ -78,4 +78,4 @@ def assert_response(resp, expected_status: int):
 def create_valid_flight(auth_headers):
     valid_aircraft = create_valid_aircraft(auth_headers)
     flight = build_flight_data(origin="NIU",destination="AKM",departure="2025-09-02 18:10:15",arrival="2025-09-02T18:54:14",base_price=2000,aircraft_id=valid_aircraft["id"])
-    return create_flight(flight,auth_headers)
+    return create_flight(flight,auth_headers).json()

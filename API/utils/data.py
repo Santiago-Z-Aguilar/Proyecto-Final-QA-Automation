@@ -359,4 +359,13 @@ passengers_to_test = [
     {"passengers": missing_passport_payload, "expected_status": 422}
 ]
 
+# ========== FLIGHTS ==========
+
+flights_to_test = [
+    {"flight_id": id_aircraft_generated, "expected_status": 404},
+    {"flight_id": id_aircraft_empty, "expected_status": 404},
+    {"flight_id": id_aircraft_number, "expected_status": 422},
+    {"flight_id": None, "expected_status": 422},
+]
+
 
