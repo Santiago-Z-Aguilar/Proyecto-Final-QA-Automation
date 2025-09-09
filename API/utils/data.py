@@ -139,10 +139,12 @@ aircraft_cases = tail_numbers_to_test + models_to_test + capacities_to_test
 # ========== PAGINATION VALUES ==========
 
 pagination_values_to_test = [
+    {"skip": None, "limit":None, "expected_status": 200},
     {"skip": 0, "limit":20, "expected_status": 200},
     {"skip": 5, "limit":20, "expected_status": 200},
     {"skip": "abc", "limit":0, "expected_status": 422},
     {"skip": 0, "limit": "abc", "expected_status": 422},
+    {"skip": 99999, "limit": 10, "expected_status": 200}
 ]
 
 # ========== DATE-TIME ==========
