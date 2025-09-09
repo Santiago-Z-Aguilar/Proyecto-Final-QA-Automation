@@ -139,10 +139,12 @@ aircraft_cases = tail_numbers_to_test + models_to_test + capacities_to_test
 # ========== PAGINATION VALUES ==========
 
 pagination_values_to_test = [
+    {"skip": None, "limit":None, "expected_status": 200},
     {"skip": 0, "limit":20, "expected_status": 200},
     {"skip": 5, "limit":20, "expected_status": 200},
     {"skip": "abc", "limit":0, "expected_status": 422},
     {"skip": 0, "limit": "abc", "expected_status": 422},
+    {"skip": 99999, "limit": 10, "expected_status": 200}
 ]
 
 # ========== DATE-TIME ==========
@@ -335,4 +337,37 @@ seats_cases = [
     {"available_seats": seats_zero, "expected_status": 201},
     {"available_seats": seats_string, "expected_status": 201},
 ]
+
+
+# ========== PASSENGERS ==========
+valid_passenger = {"full_name": valid_full_name,"passport": "string","seat": "12A"}
+null_seat_passenger = {"full_name": valid_full_name,"passport": "string","seat": None}
+missing_full_name_passenger = {"passport": "string","seat": "12A"}
+missing_passport_passenger = {"full_name": valid_full_name,"seat": "12A"}
+
+one_passenger_payload = [valid_passenger]
+two_passengers_payload = [valid_passenger,valid_passenger]
+null_seat_payload = [null_seat_passenger]
+no_passengers_payload = []
+missing_full_name_payload = [missing_full_name_passenger]
+missing_passport_payload = [missing_full_name_passenger]
+
+passengers_to_test = [
+    {"passengers": one_passenger_payload, "expected_status": 201},
+    {"passengers": two_passengers_payload, "expected_status": 201},
+    {"passengers": null_seat_payload, "expected_status": 201},
+    {"passengers": no_passengers_payload, "expected_status": 422},
+    {"passengers": missing_full_name_payload, "expected_status": 422},
+    {"passengers": missing_passport_payload, "expected_status": 422}
+]
+
+# ========== FLIGHTS ==========
+
+flights_to_test = [
+    {"flight_id": id_aircraft_generated, "expected_status": 404},
+    {"flight_id": id_aircraft_empty, "expected_status": 404},
+    {"flight_id": id_aircraft_number, "expected_status": 422},
+    {"flight_id": None, "expected_status": 422},
+]
+
 
