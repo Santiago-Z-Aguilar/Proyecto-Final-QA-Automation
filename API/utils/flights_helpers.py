@@ -21,14 +21,14 @@ def build_flight_data(origin: str, destination: str, departure: str, arrival: st
         "aircraft_id": aircraft_id
     }
 
-def build_aircraft(tail_number="N123CC",
-                   model="Boeing 737-800", capacity=200)-> Dict[str, Any]:
-    # Construye payload estándar para vuelos.
-    return {
-        "tail_number": tail_number,
-        "model": model,
-        "capacity": capacity,
-    }
+# def build_aircraft(tail_number="N123CC",
+#                    model="Boeing 737-800", capacity=200)-> Dict[str, Any]:
+#     # Construye payload estándar para vuelos.
+#     return {
+#         "tail_number": tail_number,
+#         "model": model,
+#         "capacity": capacity,
+#     }
 
 
 # ---------- API actions ----------
@@ -48,10 +48,9 @@ def get_flights() -> Optional[Dict]:
     print("STATUS: getfligths")
     return api_request("get", FLIGHTS)
 
-
-def create_aircraft(auth_headers)-> Optional[Dict]:
-    aircraft = build_aircraft()
-    return api_request("post", AIRCRAFTS, headers=auth_headers, json=aircraft)
+# def create_aircraft(auth_headers)-> Optional[Dict]:
+#     aircraft = build_aircraft()
+#     return api_request("post", AIRCRAFTS, headers=auth_headers, json=aircraft)
 
 def update_flight(id: str, payload: Dict[str, Any], auth_headers) -> Optional[Dict]:
     return api_request("put", FLIGHTS + "/" + id, headers=auth_headers, json=payload)
