@@ -18,5 +18,5 @@ def driver(request):
     headless = request.config.getoption("--headless")
     driver = create_driver(headless=headless)
     yield driver
-    sleep(2)
+    # sleep(2)
     driver.quit()

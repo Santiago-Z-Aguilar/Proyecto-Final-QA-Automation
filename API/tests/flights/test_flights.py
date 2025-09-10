@@ -1,10 +1,3 @@
-import requests
-import pytest
-from API.utils.data import *
-from API.utils.flights_helpers import *
-from API.tests.aircrafts import *
-from API.tests.aircrafts.conftest import *
-from conftest import *
 from API.tests.flights.data_fligths import *
 from API.utils.flights_helpers import *
 
