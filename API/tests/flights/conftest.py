@@ -5,6 +5,7 @@ from API.tests.aircrafts.conftest import create_valid_aircraft
 from API.utils.settings import FLIGHTS
 from API.utils.flights_helpers import *
 from API.tests.flights.data_fligths import *
+from API.utils.aircrafts_helpers import *
 
 
 
@@ -16,10 +17,8 @@ def valid_aircraft_id(auth_headers):
     """
     Create an aircraft and return its ID to associate it with a flight.
     """
-    aircraft_payload = build_aircraft()
-    response = create_aircraft(auth_headers)
-    assert response.status_code == 201, f"Create aircraft failed: {response.text}"
-    return response.json()["id"]
+    response = create_valid_aircraft(auth_headers)
+    return response["id"]
 
 
 @pytest.fixture
@@ -59,12 +58,12 @@ def base_flight_data(valid_aircraft_id):
 
 
 @pytest.fixture
-def create_flight(auth_headers, create_valid_aircraft):
+def create_flight(auth_headers):
     """
     Creates a new flight with a valid aircraft.
     Useful for booking or GET/PUT tests.
     """
-    aircraft = create_valid_aircraft()
+    aircraft = create_valid_aircraft(auth_headers)
     flight = {
         "origin": "NIU",
         "destination": "AKM",

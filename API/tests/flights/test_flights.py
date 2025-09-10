@@ -5,7 +5,7 @@ from API.utils.flights_helpers import *
 # crear aircrafts
 
 # ---------- POST TESTS ----------
-class TestPostUsers:
+class TestFlightsPOST:
 
     def test_create_flight_success(self, auth_headers, base_flight_data):
         resp = create_flight(base_flight_data, auth_headers)
@@ -34,37 +34,37 @@ class TestPostUsers:
     def test_create_flight_origin_destination_same(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_origin_dest_same)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}. Response: {detail}Origin and destination cannot be the same"
+        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}. Comment: Origin and destination cannot be the same"
 
     def test_create_flight_departure_in_past(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_departure_in_past)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}. Response: {detail} arrival_time must occur after departure_date"
+        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}. Comment: arrival_time must occur after departure_date"
 
     def test_create_flight_negative_price(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_negative_price)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}. Response: {detail}"
+        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}."
 
     def test_create_flight_zero_price(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_zero_price)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}. Response: {detail} Price cannot be zero"
+        assert resp.status_code == 422, f"Expected 422, got {resp.status_code}. Comment: Price cannot be zero"
         
     def test_create_flight_nonnumeric_price(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_nonumeric_price)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 422, f"Expected 422, got {status_code}. Response: {detail} Price should be a float"
+        assert resp.status_code == 422, f"Expected 422, got {status_code}. Comment: Price should be a float"
         
     def test_create_flight_int_price(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_int_price)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 201, f"Expected 201, got {status_code}. Response: {detail} Accept. Price should be a float "
+        assert resp.status_code == 201, f"Expected 201, got {status_code}. Comment: Accept. Price should be a float "
         
     def test_create_flight_30digits_price(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_30digits_price)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 201, f"Expected 201, got {status_code}. Response: {detail} Accept. Price should be a float "
+        assert resp.status_code == 201, f"Expected 201, got {status_code}. Comment: Accept. Price should be a float "
 
 
     def test_create_nonexistent_aircraft(self, auth_headers, nonexistent_aircraft_id):
@@ -90,17 +90,17 @@ class TestPostUsers:
     def test_create_fields_missing(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_fields_missing)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 422, f"Expected 201, got {status_code}. Response: {detail} "
+        assert resp.status_code == 422, f"Expected 201, got {status_code}. "
     
     def test_create_json_disarray(self, auth_headers, with_aircraft_id):
         payload = with_aircraft_id(data_post_json_disarray)
         resp = create_flight(payload, auth_headers)
-        assert resp.status_code == 201, f"Expected 201, got {status_code}. Response: {detail} "
-        resp_get = get_flight_by_id(flight_id)
+        assert resp.status_code == 201, f"Expected 201, got {status_code}. "
+        resp_get = get_flight_by_id(resp.json()["id"])
         assert resp_get.status_code == 200, f"Expected 200, got {resp_get.status_code}. Response: {resp_get.text}"
         fetched = resp_get.json()
-        assert fetched["origin"] == base_flight_data["origin"], (
-            f"Expected origin {base_flight_data['origin']}, got {fetched['origin']}"
+        assert fetched["origin"] == payload["origin"], (
+            f"Expected origin {payload['origin']}, got {fetched['origin']}"
         )
 
 
@@ -112,17 +112,17 @@ class TestFlightsGET:
        resp = get_flights()
        assert resp.status_code == 200, f"Expected 200, got {status_code}. Response: {detail} Server Error"
 
-    def test_get_flight_id(auth_headers, flight_id):
+    def test_get_flight_id(self, flight_id):
         resp_get = get_flight_by_id(flight_id)
         assert resp_get.status_code == 200, f"Expected 200, got {resp_get.status_code}. Response: {detail}"
         assert isinstance(resp_get.json(), dict)
 
-    def test_get_nonexistent_flight(auth_headers, fake_flight_id):
+    def test_get_nonexistent_flight(self, auth_headers, fake_flight_id):
         resp = get_flight_by_id(fake_flight_id)
         assert resp.status_code == 404, f"Expected 404, got {resp.status_code}"
 
 
-    def test_get_invalid_flight_id(auth_headers, invalid_flight_id):
+    def test_get_invalid_flight_id(self, auth_headers, invalid_flight_id):
         resp = get_flight_by_id(invalid_flight_id)
         assert resp.status_code == 404, f"Expected 404, got {resp.status_code}"
 
@@ -200,6 +200,10 @@ class TestFlightsPUT:
 # ---------- DELETE TESTS ----------
 class TestFlightsDELETE:
 
+    def test_create_flight_success(self, auth_headers, base_flight_data):
+        resp = create_flight(base_flight_data, auth_headers)
+        assert resp.status_code == 201
+
     def test_delete_flight_success(self, auth_headers, flight_id):
         assert flight_id is not None
         resp_delete = delete_flight(flight_id, auth_headers)
@@ -221,3 +225,4 @@ class TestFlightsDELETE:
         assert resp_delete.status_code == 404, (
             f"Expected 404, got {resp_delete.status_code}. Response: {resp_delete.text}"
         )
+        
