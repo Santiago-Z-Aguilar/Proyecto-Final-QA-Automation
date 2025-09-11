@@ -1,8 +1,6 @@
 # Web/pages/product_detail_page.py
 
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-
 from Web.locators.header_locators import HeaderLocators
 from Web.pages.base_page import BasePage
 from Web.locators.product_detail_locators import ProductDetailLocators
@@ -102,7 +100,7 @@ class ProductDetailPage(BasePage, Config):
         return self.text_of_element(self.locators.PRODUCT_FEATURES)
 
     def get_all_feature_elements(self):
-        return self.wait_for_elements((By.CSS_SELECTOR, "div.product-features p"))
+        return self.wait_for_elements(self.locators.ALL_FEATURES)
 
     def get_feature_texts(self):
         features = self.get_all_feature_elements()
