@@ -3,7 +3,7 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 
-from Web.locators.cart_locators import CART_BADGE
+from Web.locators.header_locators import HeaderLocators
 from Web.pages.base_page import BasePage
 from Web.locators.product_detail_locators import ProductDetailLocators
 from Web.utils.config import Config
@@ -84,7 +84,7 @@ class ProductDetailPage(BasePage, Config):
     def get_cart_count(self) -> int:
         """Return the cart items count; 0 if badge is missing or empty."""
         try:
-            return int(self.text_of_element(CART_BADGE))
+            return int(self.text_of_element(HeaderLocators.CART_BADGE))
         except Exception:
             return 0
 
