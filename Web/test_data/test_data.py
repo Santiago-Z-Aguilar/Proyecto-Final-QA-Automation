@@ -10,3 +10,80 @@ INVALID_USER_LOGIN = [
     {"email": "ag@.com", "password": "5"}, #email con formato inválido
     {"email": "yami30@gmail.com", "password": "12345"} #email no registrado
 ]
+
+
+VALID_USER_SIGNUP = [
+    {
+        "firstname": "Juan",
+        "lastname": "López",
+        "email": "juan.lopez@gmail.com",
+        "zipcode": 90210,
+        "password": "Juan#123"
+    },
+    {
+        "firstname": "Juan",
+        "lastname": "López",
+        "email": "juan.lopez@gmail.com",
+        "zipcode": 90210,
+        "password": 1
+    }
+]
+
+INVALID_USER_SIGNUP = [
+    {
+        "firstname": "Ana",
+        "lastname": "Garcia",
+        "email": "ana.garcia@gmail.com", #Email already registered
+        "zipcode": 90210,
+        "password": "Ana2024!"
+    },
+    {
+        "firstname": 12345, #Numbers as name
+        "lastname": 67890,  #Numbers as lastname
+        "email": "juan.lopez@gmail.com",
+        "zipcode": 90210,
+        "password": "Juan#123"
+    },
+    {
+        "firstname": "Juan",
+        "lastname": "López",
+        "email": "", #Empty email
+        "zipcode": 90210,
+        "password": "Juan#123"
+    },
+    {
+        "firstname": "Juan",
+        "lastname": "López",
+        "email": "juan.lopez@gmail.com",
+        "zipcode": "abbcccddddeeee", #Strings as zipcode
+        "password": "Juan#123"
+    },
+    {
+        "firstname": "Juan",
+        "lastname": "López",
+        "email": "juans@llllllllll",  #Invalid email format
+        "zipcode": 90210,
+        "password": "Juan#123"
+    },
+    {
+        "firstname": "Juan",
+        "lastname": "López",
+        "email": "juans@.com",  #email without domain
+        "zipcode": 90210,
+        "password": "Juan#123"
+    },
+    {
+        "firstname": "", #Empty credentials
+        "lastname": "",
+        "email": "",
+        "zipcode": "",
+        "password": ""
+    },
+    {
+        "firstname": 12345, #all invalid credentials
+        "lastname": 67890,
+        "email": "usuario1@.com",
+        "zipcode": "abcdeeeeeeeeeeeeeeeeee",
+        "password": ""
+    }
+]
