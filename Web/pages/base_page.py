@@ -1,9 +1,10 @@
-from selenium.common import NoSuchElementException
+# Web/pages/base_page.py
+
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from Web.locators.header_locators import HeaderLocators
+
 
 
 class BasePage:
@@ -34,3 +35,7 @@ class BasePage:
 
     def wait_for_elements(self, locator):
         return self.wait.until(EC.visibility_of_all_elements_located(locator))
+
+    def wait_for_url_contains(self, text: str, timeout: int = 10):
+        """Wait until current URL contains given text, or raise TimeoutException."""
+        return WebDriverWait(self.driver, timeout).until(EC.url_contains(text))
