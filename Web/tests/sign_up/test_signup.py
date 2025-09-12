@@ -76,15 +76,15 @@ def test_sign_up_with_valid_credentials(navigate_to_sign_up_from_home):
 
     # Wait until the overlay disappears.
     WebDriverWait(sign_up.driver,20 ).until(
-        EC.visibility_of_element_located((By.XPATH, "//button[text()='Sign Up']"))
+        EC.element_to_be_clickable((By.XPATH, "//button[text()='Sign Up']"))
     )
     #ASSERTION
     sign_up.assert_successful_sign_up()
 
-def test_sign_up_number_as_password(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_number_as_password(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -104,10 +104,10 @@ def test_sign_up_number_as_password(driver, go_to_sing_up_page, clear_local_stor
     sign_up.assert_successful_sign_up()
 
 #Email already registered - It should fail
-def test_sign_up_email_already_registered(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_email_already_registered(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -128,10 +128,10 @@ def test_sign_up_email_already_registered(driver, go_to_sing_up_page, clear_loca
 
 
 #Number as name and lastname
-def test_sign_up_numbers_as_names(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_numbers_as_names(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -152,10 +152,10 @@ def test_sign_up_numbers_as_names(driver, go_to_sing_up_page, clear_local_storag
 
 
 #Empty email
-def test_sign_up_empty_email(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_empty_email(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -176,10 +176,10 @@ def test_sign_up_empty_email(driver, go_to_sing_up_page, clear_local_storage):
 
 
 #String as zipcode
-def test_sign_up_string_as_zipcode(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_string_as_zipcode(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -200,10 +200,10 @@ def test_sign_up_string_as_zipcode(driver, go_to_sing_up_page, clear_local_stora
 
 
 #Invalid email format
-def test_sign_up_invalid_email_format(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_invalid_email_format(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -223,10 +223,10 @@ def test_sign_up_invalid_email_format(driver, go_to_sing_up_page, clear_local_st
     sign_up.assert_unsuccessful_sign_up()
 
 #Email without domain
-def test_sign_up_email_without_domain(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_email_without_domain(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -247,10 +247,10 @@ def test_sign_up_email_without_domain(driver, go_to_sing_up_page, clear_local_st
 
 
 #Empty all credentials
-def test_sign_up_empty_all_credentials(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_empty_all_credentials(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )
@@ -271,10 +271,10 @@ def test_sign_up_empty_all_credentials(driver, go_to_sing_up_page, clear_local_s
 
 
 #All invalid credentials
-def test_sign_up_all_invalid_credentials(driver, go_to_sing_up_page, clear_local_storage):
+def test_sign_up_all_invalid_credentials(navigate_to_sign_up_from_home):
     #SETUP
     #Wait until the overlay disappears.
-    sign_up = SignUpPage(driver)
+    sign_up = navigate_to_sign_up_from_home
     WebDriverWait(sign_up.driver, 20).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']")) #Title "Sign up"
     )

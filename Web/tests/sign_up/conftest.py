@@ -23,18 +23,18 @@ def driver():
 
 @pytest.fixture
 def navigate_to_sign_up_from_home(driver):
-    """Abre el home y navega hasta la página de Sign Up haciendo clic en el header"""
+    #Opens home and go to the Sign-Up page clicking header button
     driver.get("https://shophub-commerce.vercel.app/")
 
-    # Esperar a que aparezca el botón Sign Up en el header
+    # Wait for the Sign-Up button to appear in the header.
     WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable(HeaderLocators.HEADER_SIGNUP)
     )
 
-    # Hacer clic en el botón Sign Up
+    # Click on the Sign-Up Button
     driver.find_element(*HeaderLocators.HEADER_SIGNUP).click()
 
-    # Esperar a que cargue el formulario de Sign Up
+    # Wait for the Sign-Up form to load
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']"))
     )
