@@ -6,3 +6,6 @@ class HeaderLocators:
     HEADER_SIGNUP = (By.XPATH, "//button[text()='Sign Up']")
     CART = (By.XPATH, "//*[local-name()='svg' and contains(@class,'lucide-shopping-cart')]/ancestor::*[self::button or self::a][1]")
     CART_BADGE = (By.XPATH, "//*[local-name()='svg' and contains(@class,'lucide-shopping-cart')]/ancestor::*[self::button or self::a][1]//*[contains(@class,'rounded-full')][normalize-space()]")
+    BTN_CATEGORIES = (By.XPATH, "//button[normalize-space()='Categories']")
+    CATEGORY_BOOKS = (By.CSS_SELECTOR, "a[href='/categories/books']")
+    OVERLAY = (By.CSS_SELECTOR, "div.fixed.inset-0.z-50")
