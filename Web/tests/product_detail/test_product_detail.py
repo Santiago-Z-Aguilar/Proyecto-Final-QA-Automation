@@ -1,4 +1,5 @@
 # Web/tests/test_product_detail.py
+
 from selenium.webdriver.common.by import By
 from Web.pages.base_page import BasePage
 from Web.pages.product_detail_page import ProductDetailPage

@@ -27,6 +27,7 @@ class ProductDetailLocators:
 
     # ---------- FEATURES (TRUST BADGES) ----------
     # By position (requires exactly three <p> in order)
+    ALL_FEATURES = (By.CSS_SELECTOR, "div.product-features p")
     FEATURE_SHIPPING = (By.CSS_SELECTOR, "div.product-features p:first-child")
     FEATURE_RETURNS  = (By.CSS_SELECTOR, "div.product-features p:nth-child(2)")
     FEATURE_PAYMENT  = (By.CSS_SELECTOR, "div.product-features p:last-child")
