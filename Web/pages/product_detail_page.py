@@ -1,8 +1,6 @@
 # Web/pages/product_detail_page.py
 
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-
 from Web.locators.header_locators import HeaderLocators
 from Web.pages.base_page import BasePage
 from Web.locators.product_detail_locators import ProductDetailLocators
@@ -22,7 +20,7 @@ class ProductDetailPage(BasePage, Config):
     def load(self, product_id=None):
         """Load product page using product id."""
         product_id_to_use = product_id if product_id is not None else self.product_id_to_test
-        product_detail_url = f"{Config.BASE_URL}{Config.PRODUCTS_DETAIL}{product_id_to_use}"
+        product_detail_url = f"{Config.BASE_URL}{Config.PRODUCT_DETAIL}{product_id_to_use}"
         self.visit(product_detail_url)
         self.wait_for_element(self.locators.PRODUCT_FEATURES)
 
@@ -102,7 +100,7 @@ class ProductDetailPage(BasePage, Config):
         return self.text_of_element(self.locators.PRODUCT_FEATURES)
 
     def get_all_feature_elements(self):
-        return self.wait_for_elements((By.CSS_SELECTOR, "div.product-features p"))
+        return self.wait_for_elements(self.locators.ALL_FEATURES)
 
     def get_feature_texts(self):
         features = self.get_all_feature_elements()
