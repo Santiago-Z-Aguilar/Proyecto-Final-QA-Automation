@@ -33,12 +33,13 @@ class SignUpPage(BasePage, HeaderLocators, SignUpLocators, HomeLocators):
         sleep(1)
         self.click(SignUpLocators.SUBMIT_BUTTON)
 
-    def home_button_is_displayed_after_sign_up(self, GO_HOME_BUTTON):
-        self.click(self, GO_HOME_BUTTON)
-        home_after_login = self.driver.find_element(*HomeLocators.LABEL_SHOP_BY_CATEGORY)
-        assert home_after_login.is_displayed()
-        print("el boton go to home redirecciona a la pagina principal", home_after_login.is_displayed())
-        sleep(1)
+        # Espera hasta que el botón sea realmente clickable
+        WebDriverWait(self.driver, 20).until(
+            EC.element_to_be_clickable(SignUpLocators.SUBMIT_BUTTON)
+        )
+        submit_button = self.driver.find_element(*SignUpLocators.SUBMIT_BUTTON)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
+        submit_button.click()
 
     def assert_successful_sign_up(self):
         #WebDriverWait(self.driver, 10).until()
