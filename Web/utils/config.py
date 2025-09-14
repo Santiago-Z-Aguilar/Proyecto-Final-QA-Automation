@@ -10,3 +10,4 @@ class Config:
         GROCERIES = "/categories/groceries"
         CHECKOUT = "/checkout"
         CART = "/cart"
+        CONFIRMATION = "/confirmation"

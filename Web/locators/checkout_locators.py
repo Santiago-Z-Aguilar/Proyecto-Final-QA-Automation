@@ -24,6 +24,9 @@ class CheckoutLocators:
     # ---------- CONFIRMATION PAGE ----------
     PURCHASE_CONFIRMATION = (By.XPATH, "//h1[text()='Order Confirmed!']")
 
+    # ---------- CONFIRMATION PAGE ----------
+    LOADING_SPINNER = (By.CSS_SELECTOR, "svg.lucide-loader-circle")
+
 
 
 
