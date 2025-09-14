@@ -9,3 +9,4 @@ class HeaderLocators:
     BTN_CATEGORIES = (By.XPATH, "//button[normalize-space()='Categories']")
     CATEGORY_BOOKS = (By.CSS_SELECTOR, "a[href='/categories/books']")
     OVERLAY = (By.CSS_SELECTOR, "div.fixed.inset-0.z-50")
+    SEARCH_INPUT = (By.CSS_SELECTOR, "input[placeholder='Search products...']")

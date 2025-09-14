@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Web.locators.header_locators import HeaderLocators
+from selenium.webdriver import Keys
 
 
 class BasePage:
@@ -43,3 +44,12 @@ class BasePage:
     def wait_for_url_contains(self, text: str, timeout: int = 10):
         """Wait until current URL contains given text, or raise TimeoutException."""
         return WebDriverWait(self.driver, timeout).until(EC.url_contains(text))
+
+    def search_for(self, text):
+        """Writes input and press enter to search for."""
+        search_input = self.wait.until(
+            EC.visibility_of_element_located(HeaderLocators.SEARCH_INPUT)
+        )
+        search_input.clear()
+        search_input.send_keys(text)
+        search_input.send_keys(Keys.ENTER)
