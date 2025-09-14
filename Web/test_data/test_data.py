@@ -87,3 +87,16 @@ INVALID_USER_SIGNUP = [
         "password": ""
     }
 ]
+
+VALID_USER_CHECKOUT = [
+    {
+        "firstname": "Juan",
+        "lastname": "López",
+        "email": "juan.perez@test.com",
+        "phone": 5551234567,
+        "address": "Av. Reforma 123",
+        "city": "CDMX",
+        "zipcode": 12345,
+        "country": "Mexico"
+    }
+]
