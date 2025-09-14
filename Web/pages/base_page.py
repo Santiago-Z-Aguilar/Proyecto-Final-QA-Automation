@@ -39,3 +39,9 @@ class BasePage:
     def wait_for_url_contains(self, text: str, timeout: int = 10):
         """Wait until current URL contains given text, or raise TimeoutException."""
         return WebDriverWait(self.driver, timeout).until(EC.url_contains(text))
+
+    def wait_for_invisibility(self, locator: tuple[By, str], timeout: int = 10):
+        return self.wait.until(EC.invisibility_of_element(locator))
+
+    def wait_for_alert(self,timeout: int = 10):
+        return self.wait.until(EC.alert_is_present())

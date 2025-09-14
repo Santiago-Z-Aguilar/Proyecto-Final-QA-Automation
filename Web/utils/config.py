@@ -9,3 +9,4 @@ class Config:
         BOOKS = "/categories/books"
         GROCERIES = "/categories/groceries"
         CHECKOUT = "/checkout"
+        CONFIRMATION = "/confirmation"

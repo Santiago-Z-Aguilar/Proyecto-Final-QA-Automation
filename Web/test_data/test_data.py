@@ -88,8 +88,7 @@ INVALID_USER_SIGNUP = [
     }
 ]
 
-VALID_USER_CHECKOUT = [
-    {
+VALID_USER_CHECKOUT =     {
         "firstname": "Juan",
         "lastname": "López",
         "email": "juan.perez@test.com",
@@ -99,4 +98,5 @@ VALID_USER_CHECKOUT = [
         "zipcode": 12345,
         "country": "Mexico"
     }
-]
+
+USER_CHECKOUT_FIELDS = ["firstname", "lastname", "email", "phone", "address", "city", "zipcode", "country"]
