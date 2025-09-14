@@ -19,16 +19,14 @@ def driver():
     driver.quit()
 
 
-
-
-# Carpeta donde se guardarán los screenshots
+# Folder where screenshots will be saved
 SCREENSHOTS_DIR = os.path.join(os.getcwd(), "screenshots")
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """
-    Hook de pytest que se ejecuta después de cada test.
-    Si el test falla y existe el fixture `driver`, guarda un screenshot.
+    Pytest hook that runs after each test.
+    If the test fails and the `driver` fixture exists, it saves a screenshot.
     """
     outcome = yield
     report = outcome.get_result()
@@ -36,12 +34,12 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call" and report.failed:
         driver = item.funcargs.get("driver", None)
         if driver is not None:
-            # Crear carpeta screenshots si no existe
+            # Create screenshots folder if it does not exist
             os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
 
-            # Nombre del archivo = nombre del test
+            # File name = test name
             file_name = f"{report.nodeid.replace('::', '_').replace('/', '_')}.png"
             file_path = os.path.join(SCREENSHOTS_DIR, file_name)
 
             driver.save_screenshot(file_path)
-            print(f"\n📸 Screenshot guardado en: {file_path}")
+            print(f"\n📸 Screenshot saved in: {file_path}")

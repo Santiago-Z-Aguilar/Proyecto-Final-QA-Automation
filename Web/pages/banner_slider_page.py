@@ -1,59 +1,26 @@
-import os
-import time
-
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from Web.locators.banner_slider_locators import BannerSliderLocators
 
 
+class BannerSliderLocators:
+    ACTIVE_SLIDE_IMG = (By.CSS_SELECTOR, "div.opacity-100 img")
+    ALL_SLIDES = (By.CSS_SELECTOR, "div.transition-opacity img")
 
-class BannerSliderPage:
-    def __init__(self, driver, timeout=10):
-        self.driver = driver
-        self.wait = WebDriverWait(driver, timeout)
+    NEXT_BUTTON = (
+        By.CSS_SELECTOR,
+        "button[aria-label='Next'], button.right-4, button:has(svg.lucide-chevron-right)"
+    )
+    PREV_BUTTON = (By.CSS_SELECTOR,
+        "button[aria-label='Previous'], button.left-4, button:has(svg.lucide-chevron-left)"
+    )
 
-    # ---------- SLIDES ----------
-    def get_active_slide_src(self):
-        slide = self.wait.until(
-            EC.visibility_of_element_located(BannerSliderLocators.ACTIVE_SLIDE_IMG)
-        )
-        return slide.get_attribute("src")
+    SLIDER_DOTS = (By.CSS_SELECTOR, "div.flex.space-x-2 button")
+    SLIDER_DOT_ACTIVE = (By.CSS_SELECTOR, "div.flex.space-x-2 button.bg-white")  # activo
 
-    def click_next(self):
-        btn = self.wait.until(EC.element_to_be_clickable(BannerSliderLocators.NEXT_BUTTON))
-        btn.click()
+    #Redirections and Buttons
+    ACTIVE_SLIDE_BUTTON = (By.TAG_NAME, "button")
 
-    def click_prev(self):
-        btn = self.wait.until(EC.element_to_be_clickable(BannerSliderLocators.PREV_BUTTON))
-        btn.click()
-
-    # ---------- DOTS ----------
-    def get_dots(self):
-        """Devuelve todos los dots del slider"""
-        return self.driver.find_elements(By.CSS_SELECTOR, "div.absolute.bottom-4 button")
-
-    def get_active_dot_index(self):
-        """Devuelve el índice del dot activo (bg-white sin /50)"""
-        dots = self.get_dots()
-        for i, dot in enumerate(dots):
-            cls = dot.get_attribute("class")
-            if "bg-white/50" not in cls:  # activo = bg-white
-                return i
-        return -1  # no se encontró activo
-
-    def click_dot(self, index):
-        dots = self.get_dots()
-        dots[index].click()
-        time.sleep(1.5)  # esperar animación
+    CLOTHES_REDIRECTION = (By.XPATH, "//h1[normalize-space(text())=\"Men's Clothes\"]") #Men's clothes title
+    ELECTRONICS_REDIRECTION = (By.XPATH, "//h1[normalize-space(text())='Electronics']") #Electronics title
+    GROCERIES_REDIRECTION = (By.XPATH, "//h1[normalize-space(text())='Groceries']") #Groceries title
 
 
-
-    # ---------- Screenshot ----------
-
-    def save_slider_screenshot(driver, name):
-        os.makedirs("screenshots", exist_ok=True)
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
-        file_path = os.path.join("screenshots", f"{name}_{timestamp}.png")
-        driver.save_screenshot(file_path)
-        print(f"\n📸 Screenshot guardado: {file_path}")
