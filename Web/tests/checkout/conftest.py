@@ -11,4 +11,5 @@ def checkout_page(driver):
     a checkout page with 2 products in the cart.
     """
     page = CheckoutPage(driver)
+    page.load()
     return page

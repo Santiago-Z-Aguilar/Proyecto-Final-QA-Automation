@@ -30,11 +30,11 @@ class CheckoutPage(BasePage, Config):
         self.wait_for_invisibility(self.locators.LOADING_SPINNER)
         self.wait_for_element(self.locators.TITLE)
 
-    def fill_form(self, skip: list[str] = None):
+    def fill_form(self,user_data, skip: list[str] = None):
         """Fill the form, skipping any fields passed in skip list"""
         if skip is None:
             skip = []
-        user = VALID_USER_CHECKOUT
+        user = user_data
         field_mapping = {
             "firstname": self.locators.FIRST_NAME,
             "lastname": self.locators.LAST_NAME,
@@ -71,5 +71,8 @@ class CheckoutPage(BasePage, Config):
             return alert.text
         return None
 
+    def get_validation_message(self):
+        email_input = self.wait_for_element(self.locators.EMAIL)
+        return email_input.get_attribute('validationMessage')
 
 

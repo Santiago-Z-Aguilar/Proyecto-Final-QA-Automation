@@ -99,4 +99,20 @@ VALID_USER_CHECKOUT =     {
         "country": "Mexico"
     }
 
+INCOMPLETE_EMAIL_USER_CHECKOUT1 =     {
+        **VALID_USER_CHECKOUT,
+        "email": "juan@.com"
+    }
+INCOMPLETE_EMAIL_USER_CHECKOUT2 =     {
+    **VALID_USER_CHECKOUT,
+    "email": "@abc.com"
+    }
+INCOMPLETE_EMAIL_USER_CHECKOUT3 =     {
+    **VALID_USER_CHECKOUT,
+    "email": "juan@abc"
+    }
+
+
 USER_CHECKOUT_FIELDS = ["firstname", "lastname", "email", "phone", "address", "city", "zipcode", "country"]
+
+INCOMPLETE_EMAIL_USERS = [INCOMPLETE_EMAIL_USER_CHECKOUT1, INCOMPLETE_EMAIL_USER_CHECKOUT2,INCOMPLETE_EMAIL_USER_CHECKOUT3]
