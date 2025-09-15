@@ -5,10 +5,10 @@ from Web.locators.header_locators import HeaderLocators
 from Web.pages.base_page import BasePage
 from Web.locators.product_detail_locators import ProductDetailLocators
 from Web.utils.config import Config
-
+from Web.test_data.products import *
 
 class ProductDetailPage(BasePage, Config):
-    product_id_to_test = 2
+    product_id_to_test = PRODUCTS[DENIM_JEANS]["id"]
     default_quantity_products = "1"
 
     def __init__(self, driver):
