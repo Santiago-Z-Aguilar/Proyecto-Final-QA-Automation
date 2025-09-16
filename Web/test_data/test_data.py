@@ -87,6 +87,7 @@ INVALID_USER_SIGNUP = [
         "password": ""
     }
 ]
+# CHECKOUT DATA
 
 VALID_USER_CHECKOUT =     {
         "firstname": "Juan",
