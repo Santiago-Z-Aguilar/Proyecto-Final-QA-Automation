@@ -8,17 +8,40 @@ from Web.locators.header_locators import HeaderLocators
 
 
 
+def pytest_addoption(parser):
+    print(">>> conftest.py CHARGED <<<")   # debug
+    parser.addoption(
+        "--browser",
+        action="store",
+        default="chrome",
+        help="Browser to use: chrome or edge"
+    )
+
 @pytest.fixture
-def driver():
-    # Starts browser
-    driver = webdriver.Chrome()
-    driver.maximize_window()
+def driver(request):
+    browser = request.config.getoption("--browser").lower()
+
+    if browser == "chrome":
+        options = webdriver.ChromeOptions()
+        options.add_argument("--start-maximized")
+        options.add_argument("--incognito")
+        driver = webdriver.Chrome(options=options)
+
+    elif browser == "edge":
+        options = webdriver.EdgeOptions()
+        options.add_argument("--start-maximized")
+        options.add_argument("--inprivate")
+        driver = webdriver.Edge(options=options)
+
+    else:
+        raise ValueError(f"Browser no supported: {browser}")
+
     driver.implicitly_wait(10)
-
-    yield driver  # Driver is delivered to the test
-
-    # TearDown (Runs at the end of each test)
+    yield driver
     driver.quit()
+
+#Choose browser in console
+#pytest -v -s Web/tests/search/test_search.py --browser=edge 
 
 
 @pytest.fixture
