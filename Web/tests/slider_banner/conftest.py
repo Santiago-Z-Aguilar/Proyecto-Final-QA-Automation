@@ -5,8 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Web.pages.signup_page import SignUpPage
 from Web.locators.header_locators import HeaderLocators
-
-
+import os
 
 def pytest_addoption(parser):
     print(">>> conftest.py CHARGED <<<")   # debug
@@ -41,25 +40,30 @@ def driver(request):
     driver.quit()
 
 #Choose browser in console
-#pytest -v -s Web/tests/sign_up/test_signup.py --browser=edge
+#pytest -v -s Web/tests/slider_banner/test_slider_banner.py --browser=edge 
 
 
-@pytest.fixture
-def navigate_to_sign_up_from_home(driver):
-    #Opens home and go to the Sign-Up page clicking header button
-    driver.get("https://shophub-commerce.vercel.app/")
+# Folder where screenshots will be saved
+SCREENSHOTS_DIR = os.path.join(os.getcwd(), "screenshots")
 
-    # Wait for the Sign-Up button to appear in the header.
-    WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable(HeaderLocators.HEADER_SIGNUP)
-    )
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """
+    Pytest hook that runs after each test.
+    If the test fails and the `driver` fixture exists, it saves a screenshot.
+    """
+    outcome = yield
+    report = outcome.get_result()
 
-    # Click on the Sign-Up Button
-    driver.find_element(*HeaderLocators.HEADER_SIGNUP).click()
+    if report.when == "call" and report.failed:
+        driver = item.funcargs.get("driver", None)
+        if driver is not None:
+            # Create screenshots folder if it does not exist
+            os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
 
-    # Wait for the Sign-Up form to load
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, "//div[text()='Sign Up']"))
-    )
+            # File name = test name
+            file_name = f"{report.nodeid.replace('::', '_').replace('/', '_')}.png"
+            file_path = os.path.join(SCREENSHOTS_DIR, file_name)
 
-    return SignUpPage(driver)
+            driver.save_screenshot(file_path)
+            print(f"\n📸 Screenshot saved in: {file_path}")

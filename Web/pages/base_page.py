@@ -4,7 +4,8 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from Web.locators.header_locators import HeaderLocators
+from selenium.webdriver import Keys
 
 
 class BasePage:
@@ -36,12 +37,22 @@ class BasePage:
     def wait_for_elements(self, locator):
         return self.wait.until(EC.visibility_of_all_elements_located(locator))
 
+    def wait_for_element_not_present(self, locator, timeout=10):
+        return WebDriverWait(self.driver, timeout).until(
+            EC.invisibility_of_element_located(locator)
+        )
     def wait_for_url_contains(self, text: str, timeout: int = 10):
         """Wait until current URL contains given text, or raise TimeoutException."""
         return WebDriverWait(self.driver, timeout).until(EC.url_contains(text))
 
-    def wait_for_invisibility(self, locator):
-        return self.wait.until(EC.invisibility_of_element(locator))
-
     def wait_for_alert(self,timeout: int = 10):
         return self.wait.until(EC.alert_is_present())
+
+    def search_for(self, text):
+        """Writes input and press enter to search for."""
+        search_input = self.wait.until(
+            EC.visibility_of_element_located(HeaderLocators.SEARCH_INPUT)
+        )
+        search_input.clear()
+        search_input.send_keys(text)
+        search_input.send_keys(Keys.ENTER)

@@ -7,7 +7,6 @@ from Web.pages.signup_page import SignUpPage
 from Web.locators.header_locators import HeaderLocators
 
 
-
 def pytest_addoption(parser):
     print(">>> conftest.py CHARGED <<<")   # debug
     parser.addoption(
@@ -41,12 +40,12 @@ def driver(request):
     driver.quit()
 
 #Choose browser in console
-#pytest -v -s Web/tests/sign_up/test_signup.py --browser=edge
+#pytest -v -s Web/tests/search/test_search.py --browser=edge 
 
 
 @pytest.fixture
 def navigate_to_sign_up_from_home(driver):
-    #Opens home and go to the Sign-Up page clicking header button
+    """Opens home and go to the Sign-Up page clicking the Signup button """
     driver.get("https://shophub-commerce.vercel.app/")
 
     # Wait for the Sign-Up button to appear in the header.
