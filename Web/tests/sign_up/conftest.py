@@ -41,7 +41,7 @@ def driver(request):
     driver.quit()
 
 #Choose browser in console
-#pytest -v -s Web/tests/search/test_search.py --browser=edge 
+#pytest -v -s Web/tests/sign_up/test_signup.py --browser=edge
 
 
 @pytest.fixture

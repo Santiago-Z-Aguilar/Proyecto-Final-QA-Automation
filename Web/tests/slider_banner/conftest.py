@@ -40,7 +40,7 @@ def driver(request):
     driver.quit()
 
 #Choose browser in console
-#pytest -v -s Web/tests/search/test_search.py --browser=edge 
+#pytest -v -s Web/tests/slider_banner/test_slider_banner.py --browser=edge 
 
 
 # Folder where screenshots will be saved
