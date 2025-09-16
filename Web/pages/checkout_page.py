@@ -28,11 +28,11 @@ class CheckoutPage(BasePage, Config):
         self.visit(book_products)
         self.click((By.XPATH,"//button[@id='add-to-cart-31']"))
         self.click((By.XPATH,"//button[@id='add-to-cart-32']"))
-        self.wait_for_invisibility(self.locators.LOADING_SPINNER)
+        self.wait_for_element_not_present(self.locators.LOADING_SPINNER)
         self.click((By.XPATH,"//a[@href='/cart']"))
-        self.wait_for_invisibility(self.locators.LOADING_SPINNER)
+        self.wait_for_element_not_present(self.locators.LOADING_SPINNER)
         self.click((By.XPATH,"//a[@href='/checkout']"))
-        self.wait_for_invisibility(self.locators.LOADING_SPINNER)
+        self.wait_for_element_not_present(self.locators.LOADING_SPINNER)
         self.wait_for_element(self.locators.TITLE)
 
     def fill_form(self,user_data, skip: list[str] = None):
