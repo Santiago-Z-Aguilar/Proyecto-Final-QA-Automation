@@ -31,16 +31,44 @@ class TestCheckout:
             f"URL: {checkout_page.driver.current_url}"
         )
 
+    def test_validate_product_prices(self,checkout_page):
+        assert checkout_page.is_product_price_displayed(),(
+            "Product prices not displayed."
+            f"URL: {checkout_page.driver.current_url}"
+        )
 
-    def test_phone_format(self):
+    def test_validate_subtotal(self,checkout_page):
+        assert checkout_page.is_subtotal_displayed(),(
+            "Subtotal not displayed."
+            f"URL: {checkout_page.driver.current_url}"
+            f"Locator: {CheckoutLocators.SUBTOTAL_ROW}"
+        )
 
-        return
+    def test_validate_shipping(self, checkout_page):
+        assert checkout_page.is_shipping_displayed()(
+            "Subtotal not displayed."
+            f"URL: {checkout_page.driver.current_url}"
+            f"Locator: {CheckoutLocators.SHIPPING_ROW}"
+        )
 
-    def test_validate_order_summary(self):
-        return
+    def test_validate_tax(self, checkout_page):
+        assert checkout_page.is_tax_displayed()(
+            "Subtotal not displayed."
+            f"URL: {checkout_page.driver.current_url}"
+            f"Locator: {CheckoutLocators.TAX_ROW}"
+        )
 
-    def test_validate_total_price(self):
-        return
+    def test_validate_subtotal_price(self,checkout_page):
+        assert checkout_page.subtotal_calculation() == checkout_page.get_subtotal_price(),(
+            "Subtotal price doesnt match "
+        )
+
+    def test_validate_total_price(self,checkout_page):
+        assert checkout_page.total_calculation() == checkout_page.get_total_price(),(
+            "Total price doesnt match "
+        )
+
+
 
 
 
