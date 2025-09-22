@@ -6,41 +6,42 @@ from Web.pages.product_detail_page import ProductDetailPage
 from Web.locators.product_detail_locators import ProductDetailLocators
 
 
+
 # ---------- PDP BASIC VISIBILITY ----------
 class TestPDPBasics:
-    def test_product_image_display(self, product_page):
+    def test_product_image_display(self, product_page_class):
         """Product image is visible on PDP."""
-        assert product_page.product_image_displayed(), (
-            f"Product image not displayed. URL: {product_page.driver.current_url} "
-            f"Locator: {product_page.locators.PRODUCT_IMAGE}"
+        assert product_page_class.product_image_displayed(), (
+            f"Product image not displayed. URL: {product_page_class} "
+            f"Locator: {product_page_class.locators.PRODUCT_IMAGE}"
         )
 
-    def test_product_title_display(self, product_page):
+    def test_product_title_display(self, product_page_class):
         """Product title is visible on PDP."""
-        assert product_page.product_main_title_displayed(), (
-            f"Product title not displayed. URL: {product_page.driver.current_url} "
-            f"Locator: {product_page.locators.PRODUCT_MAIN_TITLE}"
+        assert product_page_class.product_main_title_displayed(), (
+            f"Product title not displayed. URL: {product_page_class.driver.current_url} "
+            f"Locator: {product_page_class.locators.PRODUCT_MAIN_TITLE}"
         )
 
-    def test_get_product_category(self, product_page):
+    def test_get_product_category(self, product_page_class):
         """Product category text is present on PDP."""
-        assert product_page.get_product_category(), (
-            f"Product category not displayed. URL: {product_page.driver.current_url} "
-            f"Locator: {product_page.locators.PRODUCT_CATEGORY}"
+        assert product_page_class.get_product_category(), (
+            f"Product category not displayed. URL: {product_page_class.driver.current_url} "
+            f"Locator: {product_page_class.locators.PRODUCT_CATEGORY}"
         )
 
-    def test_product_price_displayed(self, product_page):
+    def test_product_price_displayed(self, product_page_class):
         """Product price is visible on PDP."""
-        assert product_page.product_price_displayed(), (
-            f"Product price not displayed. URL: {product_page.driver.current_url} "
-            f"Locator: {product_page.locators.PRODUCT_MAIN_PRICE}"
+        assert product_page_class.product_price_displayed(), (
+            f"Product price not displayed. URL: {product_page_class.driver.current_url} "
+            f"Locator: {product_page_class.locators.PRODUCT_MAIN_PRICE}"
         )
 
-    def test_product_description_display(self, product_page):
+    def test_product_description_display(self, product_page_class):
         """Product description text is present on PDP."""
-        assert product_page.get_description_text(), (
-            f"Product description not displayed. URL: {product_page.driver.current_url} "
-            f"Locator: {product_page.locators.PRODUCT_DESCRIPTION_TEXT}"
+        assert product_page_class.get_description_text(), (
+            f"Product description not displayed. URL: {product_page_class.driver.current_url} "
+            f"Locator: {product_page_class.locators.PRODUCT_DESCRIPTION_TEXT}"
         )
 
 # ---------- PLP ↔ PDP CONSISTENCY ----------
