@@ -38,9 +38,10 @@ class BasePage:
         return self.wait.until(EC.visibility_of_all_elements_located(locator))
 
     def wait_for_element_not_present(self, locator, timeout=10):
-        return WebDriverWait(self.driver, timeout).until(
+        return WebDriverWait(self.driver, timeout,poll_frequency=0.1).until(
             EC.invisibility_of_element_located(locator)
         )
+
     def wait_for_url_contains(self, text: str, timeout: int = 10):
         """Wait until current URL contains given text, or raise TimeoutException."""
         return WebDriverWait(self.driver, timeout).until(EC.url_contains(text))

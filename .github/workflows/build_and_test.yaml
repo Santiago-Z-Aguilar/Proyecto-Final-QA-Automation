@@ -1,0 +1,71 @@
+name: CI test
+run-name: CI ${{ github.ref_name }}
+
+on: [push]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prueba:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        group:
+          - \Web\tests\checkout\test_checkout.py
+          - \Web\tests\home\test_home.py
+          - \Web\tests\logo\test_logo.py
+          - \Web\tests\product_detail\test_product_detail.py
+          - \Web\tests\search\test_search.py
+          - \Web\tests\shopping_cart\test_shopping_cart.py
+          - \Web\tests\sign_up\sign_up.py
+          - \Web\tests\slider_banner\test_slider_banner.py
+          - \Web\tests\test_login.py
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install pytest selenium webdriver-manager pytest-html pytest-cov behave pytest-bdd
+          fi
+
+      - name: Instalar Google Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Ejecutar pruebas con Pytest
+        env:
+          ADMIN_USER: ${{ secrets.ADMIN_USER }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: pytest --html=reports/${{ matrix.group }}.html "${{ matrix.group }}"
+
+      - name: Subir reportes
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-${{ matrix.group }}
+          path: reports/${{ matrix.group }}.html
+
+
