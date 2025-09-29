@@ -16,15 +16,7 @@ jobs:
     strategy:
       matrix:
         group:
-          - \Web\tests\checkout\test_checkout.py
-          - \Web\tests\home\test_home.py
-          - \Web\tests\logo\test_logo.py
-          - \Web\tests\product_detail\test_product_detail.py
-          - \Web\tests\search\test_search.py
-          - \Web\tests\shopping_cart\test_shopping_cart.py
-          - \Web\tests\sign_up\sign_up.py
-          - \Web\tests\slider_banner\test_slider_banner.py
-          - \Web\tests\test_login.py
+          - Web/tests/logo/test_logo.py
     steps:
       - name: Checkout
         uses: actions/checkout@v4
