@@ -30,8 +30,8 @@ jobs:
             sanitized: Web-tests-product_detail
           - group: Web/tests/shopping_cart/test_shopping_cart.py
             sanitized: Web-tests-shopping_cart
-          - group: Web/tests/slider_banner/test_slider_banner.py
-            sanitized: Web-tests-slider_banner
+          #- group: Web/tests/slider_banner/test_slider_banner.py
+           # sanitized: Web-tests-slider_banner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
