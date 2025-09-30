@@ -15,24 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group:
-          - Web/tests/home/test_home.py
-          #- Web/tests/checkout/test_checkout.py
-          - Web/tests/product_detail/test_product_detail.py
-          #- Web/tests/search/test_search.py
-          #- Web/tests/shopping_cart/test_shopping_cart.py
-          #- Web/tests/sign_up/test_sign_up.py
-          #- Web/tests/slider_banner/test_slider_banner.py
-          #- Web/tests/test_login.py
-        sanitized:
-          - Web-tests-home
-          #- Web-tests-checkout
-          - Web-tests-product_detail
-          #- Web-tests-search
-          #- Web-tests-shopping_cart
-          #- Web-tests-sign_up
-          #- Web-tests-slider_banner
-          #- Web-tests-login
+        include:
+          - group: Web/tests/home/test_home.py
+            sanitized: Web-tests-home
+          - group: Web/tests/checkout/test_checkout.py
+            sanitized: Web-tests-checkout
+          - group: Web/tests/search/test_search.py
+            sanitized: Web-tests-search
+          - group: Web/tests/sign_up/test_sign_up.py
+            sanitized: Web-tests-sign_up
+          - group: Web/tests/test_login.py
+            sanitized: Web-tests-login
+          - group: Web/tests/product_detail/test_product_detail.py
+            sanitized: Web-tests-product_detail
+          - group: Web/tests/shopping_cart/test_shopping_cart.py
+            sanitized: Web-tests-shopping_cart
+          - group: Web/tests/slider_banner/test_slider_banner.py
+            sanitized: Web-tests-slider_banner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
