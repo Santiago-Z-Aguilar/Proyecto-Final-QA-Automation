@@ -57,7 +57,7 @@ jobs:
       - name: Subir reportes
         uses: actions/upload-artifact@v4
         with:
-          name: report-${{ matrix.group }}
-          path: reports/${{ matrix.group }}.html
+          name: report-${{ matrix.group // '/' / '-' }}
+          path: reports/${{ matrix.group // '/' / '-' }}.html
 
 
