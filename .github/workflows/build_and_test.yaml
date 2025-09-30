@@ -101,7 +101,7 @@ jobs:
         run: pip install pytest-html-merger
 
       - name: Merge reports
-        run: pytest-html-merger -i reports -o final-report.html
+        run: pytest_html_merger -i reports -o final-report.html
 
       - name: Upload final merged report
         uses: actions/upload-artifact@v4
