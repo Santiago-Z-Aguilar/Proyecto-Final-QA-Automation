@@ -48,12 +48,6 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: Show Chrome version
-        run: google-chrome --version || true
-
-      - name: Show Chromedriver version
-        run: chromedriver --version || true
-        
       - name: Ejecutar pruebas con Pytest
         env:
           ADMIN_USER: ${{ secrets.ADMIN_USER }}
