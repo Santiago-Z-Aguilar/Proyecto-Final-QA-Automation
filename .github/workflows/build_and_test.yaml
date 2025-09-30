@@ -54,7 +54,7 @@ jobs:
         env:
           ADMIN_USER: ${{ secrets.ADMIN_USER }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-        run: pytest --html=reports/${{ matrix.group }}.html "${{ matrix.group }}"
+        run: pytest --html=reports/${{ matrix.group }}.html "${{ matrix.group }}" --self-contained-html
 
       - name: Subir reportes
         uses: actions/upload-artifact@v4
