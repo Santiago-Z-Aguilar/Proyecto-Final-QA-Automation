@@ -14,6 +14,7 @@ jobs:
   prueba:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - group: Web/tests/home/test_home.py
@@ -55,7 +56,7 @@ jobs:
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           else
-            pip install pytest selenium webdriver-manager pytest-html pytest-cov behave pytest-bdd
+            pip install pytest selenium webdriver-manager pytest-html pytest-cov behave pytest-bdd 
           fi
 
       - name: Instalar Google Chrome
@@ -75,5 +76,38 @@ jobs:
         with:
           name: report-${{ matrix.sanitized }}
           path: reports/${{ matrix.group }}.html
+
+
+
+  merge-reports:
+    runs-on: ubuntu-latest
+    needs: [ prueba ]   # waits for all test jobs to finish
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          path: merged_reports
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pytest-html-merger
+        run: pip install pytest-html-merger
+
+      - name: Merge reports
+        run: pytest-html-merger -i reports -o final-report.html
+
+      - name: Upload final merged report
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-report
+          path: final-report.html
+
 
 
