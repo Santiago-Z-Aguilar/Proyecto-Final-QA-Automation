@@ -17,6 +17,8 @@ jobs:
       matrix:
         group:
           - Web/tests/home/test_home.py
+        sanitized:
+          - Web-tests-home-test_home.py
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,7 +59,7 @@ jobs:
       - name: Subir reportes
         uses: actions/upload-artifact@v4
         with:
-          name: report-${{ matrix.group // '/' / '-' }}
-          path: reports/${{ matrix.group // '/' / '-' }}.html
+          name: report-${{ matrix.sanitized }}
+          path: reports/${{ matrix.group }}.html
 
 
