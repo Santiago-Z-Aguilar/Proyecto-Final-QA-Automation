@@ -12,6 +12,8 @@ def create_driver(headless: bool = False):
         options.add_argument("--headless=new")
 
     options.add_argument("--window-size=1920,1080")
+    options.add_argument("--no-sandbox")  # important for CI
+    options.add_argument("--disable-dev-shm-usage")  # important for CI
     chrome_path = os.getenv("CHROME_PATH")
     if chrome_path:
         options.binary_location = chrome_path
