@@ -22,8 +22,8 @@ jobs:
             sanitized: Web-tests-checkout
           - group: Web/tests/search/test_search.py
             sanitized: Web-tests-search
-          - group: Web/tests/sign_up/test_sign_up.py
-            sanitized: Web-tests-sign_up
+          - group: Web/tests/sign_up/test_signup.py
+            sanitized: Web-tests-signup
           - group: Web/tests/test_login.py
             sanitized: Web-tests-login
           - group: Web/tests/product_detail/test_product_detail.py
