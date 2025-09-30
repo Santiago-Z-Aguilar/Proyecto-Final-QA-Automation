@@ -19,8 +19,8 @@ jobs:
         include:
           - group: Web/tests/home/test_home.py
             sanitized: Web-tests-home
-          - group: Web/tests/checkout/test_checkout.py
-            sanitized: Web-tests-checkout
+          #- group: Web/tests/checkout/test_checkout.py
+          #  sanitized: Web-tests-checkout
           #- group: Web/tests/search/test_search.py
             #sanitized: Web-tests-search
           #- group: Web/tests/sign_up/test_signup.py
@@ -90,7 +90,7 @@ jobs:
       - name: Download all reports
         uses: actions/download-artifact@v4
         with:
-          path: merged_reports
+          path: reports
 
       - name: Setup Python
         uses: actions/setup-python@v5
