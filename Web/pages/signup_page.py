@@ -2,7 +2,7 @@ from selenium.common import TimeoutException
 
 from .base_page import BasePage
 from Web.locators.header_locators import HeaderLocators
-from Web.locators.sign_up_locators import SignUpLocators
+from Web.locators.signup_locators import SignUpLocators
 from Web.locators.home_locators import HomeLocators
 from Web.utils.config import Config
 
