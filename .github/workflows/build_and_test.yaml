@@ -71,6 +71,7 @@ jobs:
         run: pytest --html=reports/${{ matrix.group }}.html "${{ matrix.group }}" --self-contained-html
 
       - name: Subir reportes
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: report-${{ matrix.sanitized }}
