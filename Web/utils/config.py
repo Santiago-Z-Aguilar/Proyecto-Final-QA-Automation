@@ -8,6 +8,6 @@ class Config:
         ELECTRONICS = "/categories/electronics"
         BOOKS = "/categories/books"
         GROCERIES = "/categories/groceries"
-        CHECKOUT = "/checkout"
         CART = "/cart"
+        CHECKOUT = "/checkout"
         CONFIRMATION = "/confirmation"
