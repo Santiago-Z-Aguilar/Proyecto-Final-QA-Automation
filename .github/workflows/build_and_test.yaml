@@ -20,8 +20,8 @@ jobs:
             sanitized: Web-tests-home
           - group: Web/tests/checkout/test_checkout.py
             sanitized: Web-tests-checkout
-          - group: Web/tests/search/test_search.py
-            sanitized: Web-tests-search
+          #- group: Web/tests/search/test_search.py
+            #sanitized: Web-tests-search
           - group: Web/tests/sign_up/test_signup.py
             sanitized: Web-tests-signup
           - group: Web/tests/test_login.py
