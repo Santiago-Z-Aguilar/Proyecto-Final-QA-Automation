@@ -16,23 +16,23 @@ jobs:
     strategy:
       matrix:
         group:
-          #- Web/tests/home/test_home.py
-          - Web/tests/checkout/test_checkout.py
-          #- Web/tests/product_detail/test_product_detail.py
+          - Web/tests/home/test_home.py
+          #- Web/tests/checkout/test_checkout.py
+          - Web/tests/product_detail/test_product_detail.py
           #- Web/tests/search/test_search.py
           #- Web/tests/shopping_cart/test_shopping_cart.py
           #- Web/tests/sign_up/test_sign_up.py
           #- Web/tests/slider_banner/test_slider_banner.py
           #- Web/tests/test_login.py
         sanitized:
-          #- Web-tests-home.py
-          - Web-tests-checkout.py
-          #- Web-tests-product_detail.py
-          #- Web-tests-search.py
-          #- Web-tests-shopping_cart.py
-          #- Web-tests-sign_up.py
-          #- Web-tests-slider_banner.py
-          #- Web-tests-login.py
+          - Web-tests-home
+          #- Web-tests-checkout
+          - Web-tests-product_detail
+          #- Web-tests-search
+          #- Web-tests-shopping_cart
+          #- Web-tests-sign_up
+          #- Web-tests-slider_banner
+          #- Web-tests-login
     steps:
       - name: Checkout
         uses: actions/checkout@v4
