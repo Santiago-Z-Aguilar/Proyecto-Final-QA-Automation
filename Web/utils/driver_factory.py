@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
-import os
+import os, tempfile
 
 
 #Crea el driver mostrando interfaz usuario
@@ -14,6 +14,10 @@ def create_driver(headless: bool = False):
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--no-sandbox")  # important for CI
     options.add_argument("--disable-dev-shm-usage")  # important for CI
+
+    user_data_dir = tempfile.mkdtemp()
+    options.add_argument(f"--user-data-dir={user_data_dir}")
+
     chrome_path = os.getenv("CHROME_PATH")
     if chrome_path:
         options.binary_location = chrome_path
