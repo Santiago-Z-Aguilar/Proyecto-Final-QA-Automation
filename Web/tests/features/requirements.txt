@@ -1,0 +1,14 @@
+# --- BDD Framework ---
+behave==1.2.6
+
+# --- HTTP client ---
+requests==2.31.0
+
+# --- Variables de entorno ---
+python-dotenv==1.0.1
+
+# --- Datos de prueba falsos ---
+Faker==19.13.0
+
+# --- Runner alternativo de pruebas ---
+pytest==8.2.2

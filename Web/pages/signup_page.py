@@ -20,8 +20,9 @@ class SignUpPage(BasePage, HeaderLocators, SignUpLocators, HomeLocators):
 
         #print(str(HeaderLocators.HEADER_SIGNUP))
 
-    def sign_up_as_new_user(self, fistname, lastname, email, zipcode, password):
-        self.type(self.FIRST_NAME_INPUT, fistname)
+    def sign_up_as_new_user(self, firstname, lastname, email, zipcode, password):
+        """Fill out and submit the Sign Up form"""
+        self.type(self.FIRST_NAME_INPUT, firstname)
         sleep(1)
         self.type(self.LAST_NAME_INPUT, lastname)
         sleep(1)
@@ -42,6 +43,7 @@ class SignUpPage(BasePage, HeaderLocators, SignUpLocators, HomeLocators):
         submit_button.click()
 
     def assert_successful_sign_up(self):
+        """Validate that the registration was successful"""
         #WebDriverWait(self.driver, 10).until()
         WebDriverWait(self.driver, 20).until(
             EC.visibility_of_element_located(self.GO_HOME_BUTTON)
@@ -51,6 +53,7 @@ class SignUpPage(BasePage, HeaderLocators, SignUpLocators, HomeLocators):
 
 
     def assert_unsuccessful_sign_up(self):
+        """Confirm that registration failed(Go Home button does not appear)"""
         try:
             WebDriverWait(self.driver, 20).until(
                 EC.visibility_of_element_located(self.GO_HOME_BUTTON)
