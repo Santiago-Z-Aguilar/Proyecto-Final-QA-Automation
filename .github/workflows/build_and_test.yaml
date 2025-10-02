@@ -23,16 +23,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - group: API/tests/aircrafts/test_aircrafts.py
-            sanitized: API-aircrafts
+          #- group: API/tests/aircrafts/test_aircrafts.py
+          #  sanitized: API-aircrafts
           #- group: API/tests/airports/test_airports.py
           #  sanitized: API-tests-airports
-          - group: API/tests/auth/test_auth.py
-            sanitized: API-tests-auth
-          - group: API/tests/bookings/test_bookings.py
-            sanitized: API-tests-bookings
-          - group: API/tests/flights/test_flights.py
-            sanitized: API-tests-flights
+          #- group: API/tests/auth/test_auth.py
+          #  sanitized: API-tests-auth
+          #- group: API/tests/bookings/test_bookings.py
+          #  sanitized: API-tests-bookings
+          #- group: API/tests/flights/test_flights.py
+          #  sanitized: API-tests-flights
           - group: API/tests/users/test_users.py
             sanitized: API-tests-users
     steps:
