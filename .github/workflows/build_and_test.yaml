@@ -1,7 +1,9 @@
 name: CI test
 run-name: CI ${{ github.ref_name }}
 
-on: [push]
+on:
+  push:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,7 +29,7 @@ jobs:
           #  sanitized: API-tests-airports
           - group: API/tests/auth/test_auth.py
             sanitized: API-tests-auth
-          - group: API/tests/bookings/test_bookings
+          - group: API/tests/bookings/test_bookings.py
             sanitized: API-tests-bookings
           - group: API/tests/flights/test_flights.py
             sanitized: API-tests-flights
