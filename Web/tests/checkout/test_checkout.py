@@ -45,14 +45,14 @@ class TestCheckout:
         )
 
     def test_validate_shipping(self, checkout_page):
-        assert checkout_page.is_shipping_displayed()(
+        assert checkout_page.is_shipping_displayed(),(
             "Subtotal not displayed."
             f"URL: {checkout_page.driver.current_url}"
             f"Locator: {CheckoutLocators.SHIPPING_ROW}"
         )
 
     def test_validate_tax(self, checkout_page):
-        assert checkout_page.is_tax_displayed()(
+        assert checkout_page.is_tax_displayed(),(
             "Subtotal not displayed."
             f"URL: {checkout_page.driver.current_url}"
             f"Locator: {CheckoutLocators.TAX_ROW}"
