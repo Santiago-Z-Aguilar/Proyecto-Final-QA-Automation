@@ -27,12 +27,12 @@ jobs:
             sanitized: API-tests-airports
           - group: API/tests/auth/test_auth.py
             sanitized: API-tests-auth
-          #- group: API/tests/bookings/test_bookings.py
-          #  sanitized: API-tests-bookings
-          #- group: API/tests/flights/test_flights.py
-          #  sanitized: API-tests-flights
-          #- group: API/tests/users/test_users.py
-          #  sanitized: API-tests-users
+          - group: API/tests/bookings/test_bookings.py
+            sanitized: API-tests-bookings
+          - group: API/tests/flights/test_flights.py
+            sanitized: API-tests-flights
+          - group: API/tests/users/test_users.py
+            sanitized: API-tests-users
     steps:
       - name: Checkout
         uses: actions/checkout@v4
