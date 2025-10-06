@@ -66,3 +66,26 @@ flight_schema = {
     },
     "additionalProperties": True
 }
+
+booking_schema = {
+    "type": "object",
+    "required": ["id", "flight_id", "user_id","status","passengers"],
+    "properties": {
+        "id": {"type": "string"},
+        "flight_id": {"type": "string"},
+        "user_id": {"type": "string"},
+        "status": {"type": "string", "enum":["draft","paid","checked_in","cancelled"]},
+        "passengers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["full_name","passport"],
+                "properties": {
+                    "full_name": {"type": "string"},
+                    "passport": {"type": "string"},
+                    "seat": {"type": ["string", "null"]},
+                }
+            }
+        }
+    }
+}

@@ -18,5 +18,13 @@ def driver(request):
     headless = request.config.getoption("--headless")
     driver = create_driver(headless=headless)
     yield driver
-    sleep(2)
+    # sleep(2)
     driver.quit()
+
+@pytest.fixture(scope="class")
+def driver_class(request):
+    headless = request.config.getoption("--headless")
+    driver_class = create_driver(headless=headless)
+    yield driver_class
+    # sleep(2)
+    driver_class.quit()

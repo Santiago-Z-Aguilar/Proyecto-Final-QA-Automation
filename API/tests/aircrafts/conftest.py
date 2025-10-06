@@ -2,13 +2,11 @@ from API.utils.api_helpers import api_request
 from API.utils.data import valid_tail_number, valid_capacity, valid_model
 from API.utils.settings import AIRCRAFTS
 import pytest,string,random
+from API.utils.aircrafts_helpers import valid_aircraft
 
 
 
 
-
-def _valid_aircraft():
-    return {"tail_number": valid_tail_number, "model": valid_model, "capacity": valid_capacity}
 
 def _random_aircraft_id():
     first = ''.join(random.choices(string.ascii_lowercase, k=3))
@@ -49,7 +47,7 @@ def update_valid_aircraft(auth_headers,create_valid_aircraft,update_aircraft):
 @pytest.fixture
 def create_valid_aircraft(auth_headers,create_aircraft_case):
     def _create_valid_aircraft():
-        aircraft = _valid_aircraft()
+        aircraft = valid_aircraft()
         response = create_aircraft_case(aircraft)
         return response.json()
     return _create_valid_aircraft

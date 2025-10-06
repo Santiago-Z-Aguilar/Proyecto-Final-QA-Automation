@@ -23,7 +23,7 @@ class TestEmailValidation:
             "full_name": valid_full_name,
             "expected_status": expected_status,
         })
-        assert resp.status_code == expected, f"Expected {expected}, got {resp.status_code}. Body: {resp.text}"
+        assert resp.status_code == expected, f"Expected {expected}, got {resp.status_code}. Email: {email}. Body: {resp.text}"
 
 class TestPasswordValidation:
     @pytest.mark.parametrize("password, expected_status", passwords_to_test_signup.items())
