@@ -40,7 +40,7 @@ INVALID_USER_SIGNUP = [
     {
         "firstname": 12345, #Numbers as name
         "lastname": 67890,  #Numbers as lastname
-        "email": "juan.lopez@gmail.com",
+        "email": "numbername@mail.com",
         "zipcode": 90210,
         "password": "Juan#123"
     },
@@ -55,20 +55,20 @@ INVALID_USER_SIGNUP = [
         "firstname": "Juan",
         "lastname": "López",
         "email": "juan.lopez@gmail.com",
-        "zipcode": "abbcccddddeeee", #Strings as zipcode
+        "zipcode": "text", #Strings as zipcode
         "password": "Juan#123"
     },
     {
         "firstname": "Juan",
         "lastname": "López",
-        "email": "juans@llllllllll",  #Invalid email format
+        "email": "invalidemail",  #Invalid email format
         "zipcode": 90210,
         "password": "Juan#123"
     },
     {
         "firstname": "Juan",
         "lastname": "López",
-        "email": "juans@.com",  #email without domain
+        "email": "nodomain@.com",  #email without domain
         "zipcode": 90210,
         "password": "Juan#123"
     },
@@ -82,9 +82,9 @@ INVALID_USER_SIGNUP = [
     {
         "firstname": 12345, #all invalid credentials
         "lastname": 67890,
-        "email": "usuario1@.com",
-        "zipcode": "abcdeeeeeeeeeeeeeeeeee",
-        "password": ""
+        "email": "invalid@none",
+        "zipcode": "abcd",
+        "password": 123
     }
 ]
 # CHECKOUT DATA
