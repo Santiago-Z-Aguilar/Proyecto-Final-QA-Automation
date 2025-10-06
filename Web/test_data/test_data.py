@@ -14,16 +14,16 @@ INVALID_USER_LOGIN = [
 
 VALID_USER_SIGNUP = [
     {
-        "firstname": "Juan",
-        "lastname": "López",
-        "email": "juan.lopez@gmail.com",
+        "firstname": "Ana",
+        "lastname": "Garcia",
+        "email": "ana.garcia@gmail.com",
         "zipcode": 90210,
-        "password": "Juan#123"
+        "password": "Ana2024!"
     },
     {
-        "firstname": "Juan",
-        "lastname": "López",
-        "email": "juan.lopez@gmail.com",
+        "firstname": "Ana",
+        "lastname": "Garcia",
+        "email": "ana.garcia@gmail.com",
         "zipcode": 90210,
         "password": 1
     }

@@ -32,8 +32,8 @@ Feature: User Sign Up
 
     Examples:
       | firstname | lastname | email               | zipcode | password | result   |
-      | Juan      | Lopez    | juan.lopez@gmail.com| 90210   | Juan#123 | success  |
-      | Juan      | Lopez    | juan.lopez@gmail.com| 90210   | 1        | success  |
+      | Ana       | Garcia   | ana.garcia@gmail.com| 90210   | Ana2024! | success  |
+      | Ana       | Garcia   | ana.garcia@gmail.com| 90210   | 1        | success  |
       | Ana       | Garcia   | ana.garcia@gmail.com| 90210   | Ana2024! | failure  |
       | 12345     | 67890    | numbername@mail.com | 90210   | Juan#123 | failure  |
       | Juan      | Lopez    |                     | 90210   | Juan#123 | failure  |
