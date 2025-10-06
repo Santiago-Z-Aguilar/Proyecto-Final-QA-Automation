@@ -104,6 +104,15 @@ jobs:
       - name: Install pytest-html-merger
         run: pip install pytest-html-merger
 
+      - name: Check for invalid HTML files
+        run: |
+          echo "=== Checking HTML files ==="
+          for f in $(find web-reports -type f -name "*.html"); do
+          if ! grep -q "class=\"summary\"" "$f"; then
+            echo "❌ Invalid pytest-html file: $f"
+          fi
+          done
+
       - name: Merge reports
         run: pytest_html_merger -i web-reports -o web-final-report.html
 
