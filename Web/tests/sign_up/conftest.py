@@ -25,6 +25,7 @@ def driver(request):
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
         options.add_argument("--incognito")
+        options.add_argument("--headless=new")
         driver = webdriver.Chrome(options=options)
 
     elif browser == "edge":
