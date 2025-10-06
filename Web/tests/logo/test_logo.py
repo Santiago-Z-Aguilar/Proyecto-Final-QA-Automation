@@ -1,3 +1,5 @@
+# Web/tests/logo/test_logo.py
+
 import pytest
 from Web.pages.home_page import HomePage
 
