@@ -94,6 +94,7 @@ jobs:
       - name: Download all reports
         uses: actions/download-artifact@v4
         with:
+          name: web-reports
           path: web-reports
 
       - name: Setup Python
@@ -181,6 +182,7 @@ jobs:
       - name: Download all reports
         uses: actions/download-artifact@v4
         with:
+          name: api-reports
           path: api-reports
 
       - name: Setup Python
@@ -191,13 +193,13 @@ jobs:
       - name: Install pytest-html-merger
         run: pip install pytest-html-merger
 
-      - name: Diagnose broken reports
+      - name: Check for invalid HTML files
         run: |
-          echo "=== Checking HTML reports for missing summary ==="
-          find api-reports -type f -name "*.html" | while read f; do
-            if ! grep -q "class=\"summary\"" "$f"; then
-              echo "⚠️ Missing summary in $f"
-            fi
+          echo "=== Checking HTML files ==="
+          for f in $(find api-reports -type f -name "*.html"); do
+          if ! grep -q "class=\"summary\"" "$f"; then
+            echo "❌ Invalid pytest-html file: $f"
+          fi
           done
 
       - name: Merge reports
