@@ -1,13 +1,12 @@
 import pytest
 #Page Objects
-from Web.pages.base_page import BasePage
 from Web.pages.login_page import LoginPage
-from Web.test_data.test_data import VALID_USER_LOGIN, INVALID_USER_LOGIN
+from Web.utils.data import VALID_USER_LOGIN, INVALID_USER_LOGIN
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.webdriver.common.by import By
-from time import sleep
+
 
 #Precondición: carga el sitio web y redirige a la página de login
 @pytest.fixture
