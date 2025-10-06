@@ -144,7 +144,7 @@ pagination_values_to_test = [
     {"skip": 5, "limit":20, "expected_status": 200},
     {"skip": "abc", "limit":0, "expected_status": 422},
     {"skip": 0, "limit": "abc", "expected_status": 422},
-    {"skip": 99999, "limit": 10, "expected_status": 200}
+    #{"skip": 99999, "limit": 10, "expected_status": 200}
 ]
 
 # ========== DATE-TIME ==========

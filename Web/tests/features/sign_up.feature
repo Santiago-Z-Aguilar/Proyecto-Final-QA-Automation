@@ -8,7 +8,7 @@ Feature: User Sign Up
   Scenario: Sign Up button redirects correctly
     Given I am on the Home page
     When I click the Sign Up button
-    Then I must be redirected to "/sign-up"
+    Then I must be redirected to "/signup"
 
   Scenario: Sign Up button is displayed
     Given I am on the Home page
@@ -42,3 +42,4 @@ Feature: User Sign Up
       | Juan      | Lopez    | nodomain@.com       | 90210   | Juan#123 | failure  |
       |           |          |                     |         |          | failure  |
       | 12345     | 67890    | invalid@none        | abcd    | 123      | failure  |
+

@@ -6,7 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 #Crea el driver mostrando interfaz usuario
 def create_driver(headless: bool = False):
     options = webdriver.ChromeOptions()
-
+    options.add_argument("--headless=new")
     if headless:
         options.add_argument("--headless=new")
 
