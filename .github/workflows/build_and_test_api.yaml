@@ -1,8 +1,10 @@
 name: CI API
-run-name: CI ${{ github.ref_name }}
+run-name: CI API ${{ github.ref_name }}
 
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:

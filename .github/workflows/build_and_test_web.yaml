@@ -1,8 +1,10 @@
 name: CI Web
-run-name: CI ${{ github.ref_name }}
+run-name: CI Web ${{ github.ref_name }}
 
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -13,8 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-
   web-tests:
     runs-on: ubuntu-latest
     strategy:
