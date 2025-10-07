@@ -37,6 +37,12 @@ jobs:
             sanitized: Web-tests-shopping_cart
           - group: Web/tests/slider_banner/test_slider_banner.py
             sanitized: Web-tests-slider_banner
+          - group: Web/tests/e2e/test_e2e.py
+            sanitized: Web-tests-e2e
+          - group: Web/tests/logo/test_logo.py
+            sanitized: Web-tests-logo
+          - group: Web/tests/product_list/test_plp.py
+            sanitized: Web-tests-plp
     steps:
       - name: Checkout
         uses: actions/checkout@v4
