@@ -1,12 +1,15 @@
 # Web/pages/base_page.py
 
+import os
+
+from selenium.webdriver.common.devtools.v137.log import clear
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Web.locators.header_locators import HeaderLocators
 from selenium.webdriver import Keys
-
+from datetime import datetime
 
 class BasePage:
 
@@ -60,3 +63,14 @@ class BasePage:
         search_input.clear()
         search_input.send_keys(text)
         search_input.send_keys(Keys.ENTER)
+
+# --- Screenshots ---
+    def take_screenshot(self, test_name: str, category_name: str, suffix: str = ""):
+        folder = f"screenshots/test_plp/{test_name}/"
+        os.makedirs(folder, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        safe_category = category_name.replace(" ", "_").replace("'", "")
+        filename = f"{test_name}_[{safe_category}]{f'_{suffix}' if suffix else ''}_{timestamp}.png"
+        path = os.path.join(folder, filename)
+        self.driver.save_screenshot(path)
+        print(f"Screenshot guardado en: {path}")

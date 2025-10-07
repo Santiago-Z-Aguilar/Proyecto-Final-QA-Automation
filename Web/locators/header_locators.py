@@ -10,3 +10,7 @@ class HeaderLocators:
     CATEGORY_BOOKS = (By.CSS_SELECTOR, "a[href='/categories/books']")
     OVERLAY = (By.CSS_SELECTOR, "div.fixed.inset-0.z-50")
     SEARCH_INPUT = (By.CSS_SELECTOR, "input[placeholder='Search products...']")
+
+# --- Header / Carrito ---
+    CART_ICON = (By.CSS_SELECTOR, "button.relative.h-10.w-10") # El botón del carrito
+    CART_COUNT = (By.CSS_SELECTOR, "button.relative > div.absolute")  # El número de productos en el carrito

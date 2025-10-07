@@ -32,13 +32,14 @@ Feature: User Sign Up
 
     Examples:
       | firstname | lastname | email               | zipcode | password | result   |
-      | John      | Doe      | john.doe@mail.com   | 12345   | Pass123! | success  |
-      | Alice     | Smith    | alice@mail.com      | 54321   | 123456   | success  |
-      | John      | Doe      | already@mail.com    | 11111   | Pass123! | failure  |
-      | 123       | 456      | numbername@mail.com | 22222   | Pass123! | failure  |
-      | Bob       | Brown    |                     | 33333   | Pass123! | failure  |
-      | Mary      | Stone    | mary@mail           | text    | Pass123! | failure  |
-      | Eva       | Adams    | invalidemail        | 44444   | Pass123! | failure  |
-      | Max       | Payne    | max@nodomain        | 55555   | Pass123! | failure  |
+      | Ana       | Garcia   | ana.garcia@gmail.com| 90210   | Ana2024! | success  |
+      | Ana       | Garcia   | ana.garcia@gmail.com| 90210   | 1        | success  |
+      | Ana       | Garcia   | ana.garcia@gmail.com| 90210   | Ana2024! | failure  |
+      | 12345     | 67890    | numbername@mail.com | 90210   | Juan#123 | failure  |
+      | Juan      | Lopez    |                     | 90210   | Juan#123 | failure  |
+      | Juan      | Lopez    | juan.lopez@gmail.com| text    | Juan#123 | failure  |
+      | Juan      | Lopez    | invalidemail        | 90210   | Juan#123 | failure  |
+      | Juan      | Lopez    | nodomain@.com       | 90210   | Juan#123 | failure  |
       |           |          |                     |         |          | failure  |
-      | 123       | 456      | invalid@none        | abcd    | 123      | failure  |
+      | 12345     | 67890    | invalid@none        | abcd    | 123      | failure  |
+

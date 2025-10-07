@@ -1,3 +1,5 @@
+# Web/tests/shopping_cart/test_sign_up.py
+
 import pytest
 import time
 from Web.pages.signup_page import SignUpPage

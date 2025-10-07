@@ -1,3 +1,5 @@
+# Web/pages/signup_page.py
+
 from selenium.common import TimeoutException
 
 from .base_page import BasePage
